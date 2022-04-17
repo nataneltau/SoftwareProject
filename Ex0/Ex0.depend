@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1647291753 source:c:\users\נתנאל\desktop\אוניברסיטה\פרויקט תוכנה\תרגילים\תרגיל 0\id1_assigmnet.c
+	<stdio.h>
+	<math.h>
+
+1584205420 source:c:\users\נתנאל\desktop\אוניברסיטה\פרויקט תוכנה\ex0\main.c
+	<stdio.h>
+	<stdlib.h>
+
