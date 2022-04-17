@@ -1,7 +1,7 @@
 
 
 
-def kmeans(k, max_iter = 200, input_file = "", output_file = ""):
+def kmeans(k, input_file = "", output_file = "", max_iter = 200):
     #TODO check validated
 
     iter_num = 0
@@ -14,16 +14,18 @@ def kmeans(k, max_iter = 200, input_file = "", output_file = ""):
 
     fr.close()
 
+    fw = open(output_file, "w")
+
     lst_centroids = []
     lst_prev_centroids =[]
     lst_clusters = [[]]
-    empty_clusters = [[]]
+    #empty_clusters = [[]]
     
     for i in range(0, k):
         lst_centroids.append(data_points[i])
-        if i != k-1:
-            #lst_clusters.append([])
-            empty_clusters.append([])
+        #if i != k-1:
+         #   lst_clusters.append([])
+            #empty_clusters.append([])
     
 
     #empty_clusters = lst_clusters.copy()
@@ -35,7 +37,11 @@ def kmeans(k, max_iter = 200, input_file = "", output_file = ""):
         if euclidean_norm(lst_centroids, lst_prev_centroids, dimension):
             break
         
-        lst_clusters = empty_clusters.copy()
+        #lst_clusters = empty_clusters.copy()
+
+        lst_clusters = [[]]
+        for l in range(0, k-1):
+            lst_clusters.append([])
 
         lst_prev_centroids = lst_centroids.copy()
 
@@ -48,8 +54,8 @@ def kmeans(k, max_iter = 200, input_file = "", output_file = ""):
         
         iter_num += 1
     
-    print(iter_num)
-    fw = open(output_file, "w")
+    #print(iter_num)
+    #fw = open(output_file, "w")
     for element in lst_centroids:
         #fw.write(str(('%.4f'%(float(element)))) + "\n")
         fw.write(element + "\n")
@@ -159,4 +165,4 @@ def update_centroids(cluster, dimension): #cluster is list
     return str_centroid
 
 
-kmeans(3, 600, "input_1.txt", "output_11.txt")
+#kmeans(15, "input_3.txt", "output_33.txt", 300)
