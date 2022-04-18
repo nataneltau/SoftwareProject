@@ -1,8 +1,15 @@
 
 
 
-def kmeans(k, input_file = "", output_file = "", max_iter = 200):
-    #TODO check validated
+
+def kmeans(k: int, max_iter = 200, input_file = "", output_file = ""):
+    #TODO check validated and handle error
+    
+    if(type(max_iter) != int):
+        output_file = input_file
+        input_file = max_iter
+        max_iter = 200
+
 
     iter_num = 0
     fr = open(input_file, "r")
@@ -165,4 +172,4 @@ def update_centroids(cluster, dimension): #cluster is list
     return str_centroid
 
 
-#kmeans(15, "input_3.txt", "output_33.txt", 300)
+#kmeans(15, "input_3.txt", "output_44.txt")
