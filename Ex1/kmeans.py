@@ -26,16 +26,10 @@ def kmeans(k: int, max_iter = 200, input_file = "", output_file = ""):
     lst_centroids = []
     lst_prev_centroids =[]
     lst_clusters = [[]]
-    #empty_clusters = [[]]
     
     for i in range(0, k):
         lst_centroids.append(data_points[i])
-        #if i != k-1:
-         #   lst_clusters.append([])
-            #empty_clusters.append([])
     
-
-    #empty_clusters = lst_clusters.copy()
 
     while True:
         if iter_num == max_iter:
@@ -44,7 +38,6 @@ def kmeans(k: int, max_iter = 200, input_file = "", output_file = ""):
         if euclidean_norm(lst_centroids, lst_prev_centroids, dimension):
             break
         
-        #lst_clusters = empty_clusters.copy()
 
         lst_clusters = [[]]
         for l in range(0, k-1):
@@ -62,9 +55,7 @@ def kmeans(k: int, max_iter = 200, input_file = "", output_file = ""):
         iter_num += 1
     
     #print(iter_num)
-    #fw = open(output_file, "w")
     for element in lst_centroids:
-        #fw.write(str(('%.4f'%(float(element)))) + "\n")
         fw.write(element + "\n")
     
     fw.close()
@@ -81,14 +72,12 @@ def euclidean_norm(lst_centroids, lst_prev_centroids, dimension):
     for i in range(0, len(lst_centroids) ):
         if (abs(calc_dist(lst_prev_centroids[i], lst_centroids[i], dimension)) ** (1/2)) >= small_than_e:
             return False
-
-        #if abs(calc_norm(lst_centroids[i], dimension) - calc_norm(lst_prev_centroids[i], dimension)) >= small_than_e:
-         #   return False
     
     return True
 
 
-def calc_norm(vektor: str, dimension: int):
+#in the end I am not using thin function, but maybe will so not delete
+"""def calc_norm(vektor: str, dimension: int):
 
     norm_vek = vektor.split(",")
     norm_vek = [float(i) for i in norm_vek]
@@ -99,7 +88,7 @@ def calc_norm(vektor: str, dimension: int):
 
     norm = norm ** (1/2)
 
-    return norm
+    return norm"""
 
 
 #this function return the index of the closest cluster to x
@@ -162,10 +151,8 @@ def update_centroids(cluster, dimension): #cluster is list
     for k in range (0, dimension - 1):
 
         str_centroid += str('%.4f'%new_centroid[k]) + ","
-        #str_centroid += str(new_centroid[k]) + ","
     
     str_centroid += str('%.4f'%new_centroid[dimension - 1])
-    #str_centroid += str(new_centroid[dimension - 1])
 
     
     
