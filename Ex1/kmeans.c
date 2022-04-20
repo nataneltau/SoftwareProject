@@ -40,11 +40,11 @@ double *makeDataDuoble(char *vektor_char, int dimension){//when using this func,
 
 }//end of function makeDataDuoble
 
+int ftoa(float n, char* res, int afterpoint, int index);
+
 double calc_dist(char *x, char *centroid, int dimension);//this function calculate (x-centroid)^2
 
 int calc_argmin(int k, char *x, char (*arr_centroids)[k], int dimension);
-
-void update_centroids(char *cluster, int dimension, char *str_centroid_buffer);
 
 int calcLineLen(char *input_file);
 
@@ -76,6 +76,51 @@ int euclidean_norm( int k, char (*arr_centroids)[k], char (*arr_prev_centroids)[
     
     return 1;
 }//end of function euclidean_norm
+
+void update_centroids(int clus_len, char (*cluster)[clus_len], int dimension, char *str_centroid_buffer){
+
+    double the_new_centroid[dimension];
+
+    if(clus_len == 0){
+        return;
+    }//end of if
+
+    for(int m =0; m<dimension; m++){
+        the_new_centroid[m]=0;
+    }//end of for
+
+    for(int i=0; i<clus_len; i++){
+
+        double *clus_double = makeDataDuoble(cluster[i], dimension);
+
+        for(int j=0; j<dimension; j++){
+
+            the_new_centroid[j] += clus_double[j];
+
+        }//end of inner for
+
+        free(clus_double);
+
+    }//end of for
+
+    for(int n=0; n<dimension; n++){
+        the_new_centroid[n] = the_new_centroid[n] / clus_len;
+    }//end of for
+
+    int index = 0;
+
+    for(int k = 0; k<dimension-1; k++){
+        index = ftoa(the_new_centroid[k], str_centroid_buffer, 4, index);
+        str_centroid_buffer[index] = ',';
+        index++;
+
+    }//end of for
+    index = ftoa(the_new_centroid[dimension-1], str_centroid_buffer, 4, index);
+    str_centroid_buffer[index] = '\0';
+
+
+
+}//end of function update_centroids
 
 int kmeans(int k, int max_iter, char *input_file, char *output_file){
 
@@ -114,12 +159,6 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
     char arr_prev_centroids[k][line_len];
     char arr_clusters[k][data_num][line_len];
     int index_for_cluster_k[k];
-
-    for(i = 0; i<k; i++){
-
-        index_for_cluster_k[i] = 0;
-
-    }//end of for
     
     for(i=0; i<k; i++){
 
@@ -134,9 +173,10 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
         
         
         
-        for(int m = 0; m<data_num; m++){
+        for(int m = 0; m<k; m++){
 
             memset(arr_clusters[m], 0, sizeof arr_clusters[m]);
+            index_for_cluster_k[i] = 0;
 
         }//end of for
 
@@ -150,26 +190,33 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
 
             index_to_cluster = calc_argmin(k, data_points[i], arr_centroids, dimension);
 
-            strcpy(arr_clusters[index_to_cluster][index_for_cluster_k[index_to_cluster]], data_points[i]);
+            strcpy(arr_clusters[index_to_cluster][index_for_cluster_k[index_to_cluster]], data_points[i]);//maybe use strncpy ?
 
             index_for_cluster_k[index_to_cluster]++;
 
         }//end of for
         //after the for, in arr_cluster[i] there is all the x_j that u_i is their closest centroid
 
-        //for j in range(0, k):
-         //   lst_centroids[j] = update_centroids(lst_clusters[j], dimension)
-        
+        for(int j=0; j<k; j++){
+            char str_centroid_buffer[line_len];
+            update_centroids(index_for_cluster_k[j], arr_clusters[j], dimension, str_centroid_buffer);
 
-
-        //remain to complete in this func (kmeans) this while loop and writing update_centroids func
+            strcpy(arr_centroids[j], str_centroid_buffer);//maybe use strncpy ?
+        }//end of for
         //and the writing to file after it
-
 
 
         iter_num++;
     }//end of while
 
+    printf("number of iter: %d\n", iter_num);
+    for(int i=0; i<k; i++){
+        
+        fprintf(fw, "%s\n", arr_centroids[i]);
+
+    }//end of for
+
+    fclose(fw);
 
     return 0;//the run complete succesfuly
 
@@ -179,12 +226,29 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
 int calcLineLen(char *input_file){
     FILE *fr = fopen(input_file, "r");
     int line_len = 0;
+    int max_line = -1;
 
-    while(fgetc(fr) != '\n'){
+    while(1){
+
+        line_len = 0;
+
+        while(fgetc(fr) != '\n'){
+
         line_len++;
+
+        }//end of inner while
+
+        if(max_line < line_len){
+            max_line = line_len;
+        }
+
+        if(feof(fr)){
+            break;
+        }
+
     }//end of while
 
-    return line_len;
+    return max_line;
 
 }//end of function calcLineLen
 
@@ -253,20 +317,19 @@ double calc_dist(char *x, char *centroid, int dimension){
 
 }//end of function calc_dist
 
-void update_centroids(char *cluster, int dimension, char *str_centroid_buffer){
-
-   
-}//end of function update_centroids
-
 int main(int argc, char *argv[]){
 
     //before sending to the functions need to check validate of each argument
 
+    kmeans(3, 600, "input_1.txt", "output_11_cc_11.txt");
+
     /*if(argc == 4){
-        kmeans(atoi(argv[1]), DEFAULT_ITER, argv[2], argv[3]);
+        printf("4 elements\n");
+        return kmeans(atoi(argv[1]), DEFAULT_ITER, argv[2], argv[3]);
     }
     else if(argc == 5){
-        kmeans(atoi(argv[1]), atoi(argv[2]), argv[3], argv[4]);
+        printf("5 elements\n");
+        return kmeans(atoi(argv[1]), atoi(argv[2]), argv[3], argv[4]);
     }
     else{
         printf("Invalid Input!");
@@ -275,7 +338,70 @@ int main(int argc, char *argv[]){
 
 
     //printf("%d", numbersOfLines("test line len.txt", 100));
-   
+
     return 0;
 
 }//end of main func
+
+
+
+//if can't use need to do something simular
+// Reverses a string 'str' of length 'len'
+void reverse(char* str, int len)
+{
+    int i = 0, j = len - 1, temp;
+    while (i < j) {
+        temp = str[i];
+        str[i] = str[j];
+        str[j] = temp;
+        i++;
+        j--;
+    }
+}
+  
+// Converts a given integer x to string str[]. 
+// d is the number of digits required in the output. 
+// If d is more than the number of digits in x, 
+// then 0s are added at the beginning.
+int intToStr(int x, char str[], int d)
+{
+    int i = 0;
+    while (x) {
+        str[i++] = (x % 10) + '0';
+        x = x / 10;
+    }
+  
+    // If number of digits required is more, then
+    // add 0s at the beginning
+    while (i < d)
+        str[i++] = '0';
+  
+    reverse(str, i);
+    str[i] = '\0';
+    return i;
+}
+  
+// Converts a floating-point/double number to a string.
+int ftoa(float n, char* res, int afterpoint, int index)
+{
+    // Extract integer part
+    int ipart = (int)n;
+  
+    // Extract floating part
+    float fpart = n - (float)ipart;
+  
+    // convert integer part to string
+    int i = intToStr(ipart, res + index, 0);
+  
+    // check for display option after point
+    if (afterpoint != 0) {
+        res[i] = '.'; // add dot
+  
+        // Get the value of fraction part upto given no.
+        // of points after dot. The third parameter 
+        // is needed to handle cases like 233.007
+        fpart = fpart * pow(10, afterpoint);
+  
+        return intToStr((int)fpart, res + i + 1 + index, afterpoint);
+    }
+}
