@@ -22,7 +22,7 @@ struct linked_list{
 //this function make an array of string to an array of float, it basically makes the vektor from string representation to double one
 double *makeDataDuoble(char *vektor_char, int dimension){//when using this func, the caller need to free memory at the end of the use
     char *token = strtok(vektor_char, ",");
-    double *vektor_double = malloc(dimension);
+    double *vektor_double = malloc(sizeof(double)*dimension);
     int k = 0;
 
     if(!vektor_double){//need to deal with it
@@ -228,13 +228,16 @@ int calcLineLen(char *input_file){
     int line_len = 0;
     int max_line = -1;
 
-    while(1){
+    while(!(feof(fr))){
 
         line_len = 0;
 
         while(fgetc(fr) != '\n'){
 
         line_len++;
+        if(feof(fr)){
+            break;
+        }
 
         }//end of inner while
 
@@ -242,9 +245,9 @@ int calcLineLen(char *input_file){
             max_line = line_len;
         }
 
-        if(feof(fr)){
-            break;
-        }
+        //if(feof(fr)){
+        //    break;
+        //}
 
     }//end of while
 
