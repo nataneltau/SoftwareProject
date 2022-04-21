@@ -17,7 +17,9 @@ void makeDataDuoble(int line_len, char vektor_char[line_len], int dimension, dou
     char copy_vektor_char[line_len];
     double num;
 
-    strcpy(copy_vektor_char, vektor_char);
+    memset(copy_vektor_char, 0, sizeof(copy_vektor_char));
+
+    strncpy(copy_vektor_char, vektor_char, line_len);
 
     char *token = strtok(copy_vektor_char, ",");
     int k = 0;
@@ -63,7 +65,7 @@ int euclidean_norm( int k, int line_len, char arr_centroids[k][line_len], char a
 
         tmp = calc_dist(arr_prev_centroids[i], arr_centroids[i], dimension, line_len);
         tmp = fabs(tmp);
-        tmp = pow(tmp, 0.5);
+        tmp = sqrt(tmp);
 
         if(tmp >= small_than_e){//if this true than there is at least one centroid which his euclidean norm bigger than 0.001
             return 0;
@@ -76,7 +78,7 @@ int euclidean_norm( int k, int line_len, char arr_centroids[k][line_len], char a
 }//end of function euclidean_norm
 
 //this func calculate the new centroids, like line6 in the alg in ex1
-void update_centroids(int clus_len, int line_len, int data_num, char cluster[data_num][line_len], int dimension, char *str_centroid_buffer){
+void update_centroids(double clus_len, int line_len, int data_num, char cluster[data_num][line_len], int dimension, char *str_centroid_buffer){
 
     double the_new_centroid[dimension];
 
@@ -90,6 +92,7 @@ void update_centroids(int clus_len, int line_len, int data_num, char cluster[dat
 
     for(int i=0; i<clus_len; i++){//sum each coordinate for all the vektors in the cluster
 
+        
         double clus_double[dimension];
         makeDataDuoble(line_len, cluster[i], dimension, clus_double);
 
@@ -110,9 +113,7 @@ void update_centroids(int clus_len, int line_len, int data_num, char cluster[dat
 
     char tmp_buffer[line_len];
 
-    for(int a = 0; a<line_len; a++){
-        tmp_buffer[a] = '\0';
-    }
+    memset(tmp_buffer, 0, sizeof(tmp_buffer));
 
     for(int k = 0; k<dimension-1; k++){//convert the new centroid to a string
         //index = ftoa(the_new_centroid[k], str_centroid_buffer, 4, index);
@@ -150,10 +151,16 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
 
     int iter_num = 0;
     int line_len = calcLineLen(input_file);
-    int data_num = numbersOfLines(input_file, line_len)+1;
+    int data_num = numbersOfLines(input_file, line_len);
     char buff[line_len+1];
-    char data_points[data_num][line_len+1];
+    char data_points[data_num][line_len];
     int dimension=0;
+
+    memset(buff, 0, sizeof(buff));
+
+    for(int k=0; k<data_num; k++){
+        memset(data_points[k], 0, sizeof(data_points[k]));
+    }
     
     FILE* fr = fopen(input_file, "r");
 
@@ -192,8 +199,11 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
 
         strcpy(arr_centroids[i], data_points[i]);//maybe use strncpy ?
 
+        printf("the cent[%d]: %s\n", i, arr_centroids[i]);
+
     }//end of for
 
+    
 
     int index_to_cluster;
 
@@ -237,6 +247,8 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
 
             char str_centroid_buffer[line_len];
 
+            memset(str_centroid_buffer, 0, sizeof(str_centroid_buffer));
+
             //printf("this: %s\n", arr_clusters[j][0]);
 
             update_centroids(index_for_cluster_k[j], line_len, data_num, arr_clusters[j], dimension, str_centroid_buffer);
@@ -245,8 +257,8 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
         }//end of for
         //and the writing to file after it
 
-        printf("arr_prev_centroid: %s\n", arr_prev_centroids[1]);
-        printf("arr_centroid: %s\n", arr_centroids[1]);
+        //printf("arr_prev_centroid: %s\n", arr_prev_centroids[1]);
+        //printf("arr_centroid: %s\n", arr_centroids[1]);
         iter_num++;//increasing the number of iterations
 
     }//end of while
@@ -292,6 +304,8 @@ int calcLineLen(char *input_file){
         //}
 
     }//end of while
+
+    max_line++;
 
     return max_line;
 
@@ -347,6 +361,9 @@ double calc_dist(char *x, char *centroid, int dimension, int line_len){//calcula
     
     //printf("to makeDataDuoblre: %s\n", centroid);
 
+    memset(x_double, 0, sizeof(x_double));
+    memset(centroid_double, 0, sizeof(centroid_double));
+
     makeDataDuoble(line_len, x, dimension, x_double);//convert from string to double
     makeDataDuoble(line_len, centroid, dimension, centroid_double);//convert from string to double
 
@@ -367,7 +384,7 @@ int main(int argc, char *argv[]){
 
     //before sending to the functions need to check validate of each argument
 
-    kmeans(3, 600, "input_1.txt", "output_11_cc_11.txt");
+    kmeans(15, 300, "input_3.txt", "output_33_cc_33.txt");
 
 
     /*if(argc == 4){
@@ -395,7 +412,7 @@ int main(int argc, char *argv[]){
 //if can't use need to do something simular wait email from Rami
 
 // Reverses a string 'str' of length 'len'
-void reverse(char* str, int len)
+/*void reverse(char* str, int len)
 {
     int i = 0, j = len - 1, temp;
     while (i < j) {
@@ -463,4 +480,4 @@ int ftoa(double n, char* res, int afterpoint, int index)
 
         return i + 1 + index + j + is_negative;
     }
-}
+}*/
