@@ -106,16 +106,42 @@ void update_centroids(int clus_len, int line_len, int data_num, char cluster[dat
     }//end of for
 
     int index = 0;
+    int last_time = 0;
+
+    char tmp_buffer[line_len];
+
+    for(int a = 0; a<line_len; a++){
+        tmp_buffer[a] = '\0';
+    }
 
     for(int k = 0; k<dimension-1; k++){//convert the new centroid to a string
-        index = ftoa(the_new_centroid[k], str_centroid_buffer, 4, index);
-        str_centroid_buffer[index] = ',';
-        index++;
+        //index = ftoa(the_new_centroid[k], str_centroid_buffer, 4, index);
+        //str_centroid_buffer[index] = ',';
+        //index++;
+
+        index = sprintf(tmp_buffer, "%.4f,", the_new_centroid[k]);
+
+        //printf("the tmp_buffer: %s\n", tmp_buffer);
+
+        for(int m = 0; m<index; m++){
+            str_centroid_buffer[m+last_time] = tmp_buffer[m];
+        }
+        //printf("the str_centroid_buffer: %s\n", str_centroid_buffer);
+        last_time += index;
 
     }//end of for
-    index = ftoa(the_new_centroid[dimension-1], str_centroid_buffer, 4, index);
-    str_centroid_buffer[index] = '\0';
+    //index = ftoa(the_new_centroid[dimension-1], str_centroid_buffer, 4, index);
+    index = sprintf(tmp_buffer, "%.4f", the_new_centroid[dimension-1]);
 
+        //printf("the tmp_buffer: %s\n", tmp_buffer);
+
+        for(int m = 0; m<index; m++){
+            str_centroid_buffer[m+last_time] = tmp_buffer[m];
+        }
+        //printf("the str_centroid_buffer: %s\n", str_centroid_buffer);
+        last_time += index;
+    str_centroid_buffer[last_time] = '\0';
+    //printf("the final!!!: %s\n", str_centroid_buffer);
 
 
 }//end of function update_centroids
@@ -219,7 +245,8 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
         }//end of for
         //and the writing to file after it
 
-
+        printf("arr_prev_centroid: %s\n", arr_prev_centroids[1]);
+        printf("arr_centroid: %s\n", arr_centroids[1]);
         iter_num++;//increasing the number of iterations
 
     }//end of while
@@ -342,6 +369,7 @@ int main(int argc, char *argv[]){
 
     kmeans(3, 600, "input_1.txt", "output_11_cc_11.txt");
 
+
     /*if(argc == 4){
         printf("4 elements\n");
         return kmeans(atoi(argv[1]), DEFAULT_ITER, argv[2], argv[3]);
@@ -404,6 +432,10 @@ int intToStr(int x, char str[], int d)
 // Converts a floating-point/double number to a string.
 int ftoa(double n, char* res, int afterpoint, int index)
 {
+    int is_negative = 0;
+    if(n<0){
+        is_negative = 1;
+    }
     // Extract integer part
     int ipart = (int)n;
   
@@ -411,7 +443,10 @@ int ftoa(double n, char* res, int afterpoint, int index)
     double fpart = n - (double)ipart;
   
     // convert integer part to string
+    printf("res before first: %s\n", res);
     int i = intToStr(ipart, res + index, 0);
+
+    printf("res after first: %s\n", res);
   
     // check for display option after point
     if (afterpoint != 0) {
@@ -422,8 +457,10 @@ int ftoa(double n, char* res, int afterpoint, int index)
         // is needed to handle cases like 233.007
         fpart = fpart * pow(10, afterpoint);
   
-        intToStr((int)fpart, res + i + 1 + index, afterpoint);
+        int j = intToStr((int)fpart, res + i + 1 + index, afterpoint);
 
-        return i + 1 + index;
+        printf("res after second: %s\n", res);
+
+        return i + 1 + index + j + is_negative;
     }
 }
