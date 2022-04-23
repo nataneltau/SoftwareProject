@@ -28,7 +28,7 @@ def kmean(k: int, max_iter = 200, input_file = "", output_file = ""):
         print("An Error Has Occurred")
         return
 
-    if(dimension <= 0 or data_num <=0):
+    if(dimension <= 0 or data_num <=0 or k <= 0 or max_iter <= 0):
         print("Invalid Input!")
         fr.close()
         return

@@ -220,7 +220,8 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
     char *str_centroid_buffer;
     FILE *fr, *fw;
 
-    if(line_len <= 0 || data_num <= 0){
+
+    if(line_len <= 0 || data_num <= 0 || k <= 0 || max_iter <= 0){
         printf("Invalid Input!\n");
         exit(1);
     }
