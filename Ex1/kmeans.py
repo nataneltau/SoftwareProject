@@ -1,8 +1,8 @@
+import sys
 
 
 
-
-def kmeans(k: int, max_iter = 200, input_file = "", output_file = ""):
+def kmean(k: int, max_iter = 200, input_file = "", output_file = ""):
     #TODO check validated and handle error
     
     if(type(max_iter) != int):
@@ -158,5 +158,11 @@ def update_centroids(cluster, dimension): #cluster is list
     
     return str_centroid
 
-
+#print(len(sys.argv))
+if len(sys.argv) == 5:
+    kmean(int(sys.argv[1]), int(sys.argv[2]), sys.argv[3], sys.argv[4])
+elif len(sys.argv) == 4:
+    kmean(int(sys.argv[1]), sys.argv[2], sys.argv[3])
+else:
+    print("Invalid Input!")
 #kmeans(15, "input_3.txt", "output_44.txt")
