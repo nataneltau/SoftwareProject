@@ -22,7 +22,7 @@ void makeDataDuoble(int line_len, const char *vektor_char, int dimension, double
     copy_vektor_char = (char *)calloc(line_len, sizeof(char));
     /*memset(copy_vektor_char, 0, sizeof(copy_vektor_char));*/
 
-    if(!copy_vektor_char){//calloc failed
+    if(!copy_vektor_char){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
@@ -101,14 +101,14 @@ void update_centroids(double clus_len, int line_len, int data_num, char **cluste
 
     the_new_centroid = (double *)calloc(dimension, sizeof(double));
 
-    if(!the_new_centroid){//calloc failed
+    if(!the_new_centroid){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
     clus_double = (double *)calloc(dimension, sizeof(double));
 
-   if(!clus_double){//calloc failed
+   if(!clus_double){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
@@ -132,7 +132,7 @@ void update_centroids(double clus_len, int line_len, int data_num, char **cluste
         free(clus_double);
         clus_double = (double *)calloc(dimension, sizeof(double));
 
-        if(!clus_double){//calloc failed
+        if(!clus_double){/*calloc failed*/
             printf("An Error Has Occurred\n");
             exit(1);
         }
@@ -159,7 +159,7 @@ void update_centroids(double clus_len, int line_len, int data_num, char **cluste
 
     tmp_buffer = (char *)calloc(line_len, sizeof(char));
 
-    if(!tmp_buffer){//calloc failed
+    if(!tmp_buffer){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
@@ -227,49 +227,49 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
 
     str_centroid_buffer = (char *)calloc(line_len, sizeof(char));
 
-    if(!str_centroid_buffer){//calloc failed
+    if(!str_centroid_buffer){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
     buff = (char *)calloc(line_len, sizeof(char));
 
-    if(!buff){//calloc failed
+    if(!buff){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
     data_points = (char **)calloc(data_num, sizeof(char*));
 
-    if(!data_points){//calloc failed
+    if(!data_points){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
     arr_centroids = (char **)calloc(k, sizeof(char*));
 
-    if(!arr_centroids){//calloc failed
+    if(!arr_centroids){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
     arr_prev_centroids = (char **)calloc(k, sizeof(char*));
 
-    if(!arr_prev_centroids){//calloc failed
+    if(!arr_prev_centroids){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
     arr_clusters = (char ***)calloc(k, sizeof(char**));
 
-    if(!arr_clusters){//calloc failed
+    if(!arr_clusters){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
     index_for_cluster_k = (int *)calloc(k, sizeof(int));
 
-    if(!index_for_cluster_k){//calloc failed
+    if(!index_for_cluster_k){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
@@ -280,7 +280,7 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
         /*memset(data_points[k], 0, sizeof(data_points[k]));*/
         data_points[f] = (char *)calloc(line_len, sizeof(char));
 
-        if(!data_points[f]){//calloc failed
+        if(!data_points[f]){/*calloc failed*/
             printf("An Error Has Occurred\n");
             exit(1);
         }
@@ -288,21 +288,21 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
         if(f<k){
             arr_centroids[f] = (char *)calloc(line_len, sizeof(char));
 
-            if(!arr_centroids[f]){//calloc failed
+            if(!arr_centroids[f]){/*calloc failed*/
                 printf("An Error Has Occurred\n");
                 exit(1);
             }
 
             arr_prev_centroids[f] = (char *)calloc(line_len, sizeof(char));
 
-            if(!arr_prev_centroids[f]){//calloc failed
+            if(!arr_prev_centroids[f]){/*calloc failed*/
                 printf("An Error Has Occurred\n");
                 exit(1);
             }
 
             arr_clusters[f] = (char **)calloc(data_num, sizeof(char*));
 
-            if(!arr_clusters[f]){//calloc failed
+            if(!arr_clusters[f]){/*calloc failed*/
                 printf("An Error Has Occurred\n");
                 exit(1);
             }
@@ -313,7 +313,7 @@ int kmeans(int k, int max_iter, char *input_file, char *output_file){
         for(j =0; j<data_num; j++){
             arr_clusters[f][j] = (char *)calloc(line_len, sizeof(char));
 
-            if(!arr_clusters[f][j]){//calloc failed
+            if(!arr_clusters[f][j]){/*calloc failed*/
                 printf("An Error Has Occurred\n");
                 exit(1);
             }
