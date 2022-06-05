@@ -15,7 +15,7 @@ def kmean(k: int, max_iter = 200, input_file = "", output_file = ""):
     try:
         fr = open(input_file, "r")
     except OSError:
-        print("Invalid Input!")
+        print("Invalid Input!\n")
         return    
 
     try:
@@ -25,11 +25,11 @@ def kmean(k: int, max_iter = 200, input_file = "", output_file = ""):
         tmp = data_points[0].split(",")
         dimension = len(tmp)
     except:
-        print("An Error Has Occurred")
+        print("An Error Has Occurred\n")
         return
 
     if(dimension <= 0 or data_num <=0 or k <= 0 or max_iter <= 0):
-        print("Invalid Input!")
+        print("Invalid Input!\n")
         fr.close()
         return
     
@@ -40,7 +40,7 @@ def kmean(k: int, max_iter = 200, input_file = "", output_file = ""):
     try:
         fw = open(output_file, "w")
     except OSError:
-        print("Invalid Input!")
+        print("Invalid Input!\n")
         return
 
     try:
@@ -81,7 +81,7 @@ def kmean(k: int, max_iter = 200, input_file = "", output_file = ""):
         
         
     except:
-        print("An Error Has Occurred")
+        print("An Error Has Occurred\n")
         
     finally:
         fw.close()
@@ -201,10 +201,14 @@ def update_centroids(cluster, dimension): #cluster is list
         raise Exception()
 
 #print(len(sys.argv))
-if len(sys.argv) == 5:
-    kmean(int(sys.argv[1]), int(sys.argv[2]), sys.argv[3], sys.argv[4])
-elif len(sys.argv) == 4:
-    kmean(int(sys.argv[1]), sys.argv[2], sys.argv[3])
-else:
-    print("Invalid Input!")
+try:
+    if len(sys.argv) == 5:
+        kmean(int(sys.argv[1]), int(sys.argv[2]), sys.argv[3], sys.argv[4])
+    elif len(sys.argv) == 4:
+        kmean(int(sys.argv[1]), sys.argv[2], sys.argv[3])
+    else:
+        print("Invalid Input!\n")
+        
+except:
+    print("Invalid Input!\n")
 #kmeans(15, "input_3.txt", "output_44.txt")
