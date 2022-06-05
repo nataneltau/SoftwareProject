@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     #kmeans_plus_plus(1,1,1,"input_1_db_1.txt",1)
 
-
+"""
 indexes = [i for i in range(N)]
 index = np.random.choice(indexes)
 centroid = nodes.iloc[index]
@@ -114,5 +114,5 @@ def tr(nodes , centroids):
         D_l.append(argmin(row, centroids))
     return D_l
     
-
+"""
 
