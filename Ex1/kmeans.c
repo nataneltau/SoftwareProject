@@ -613,14 +613,22 @@ int main(int argc, char *argv[]){
 
     if(argc == 4){
         /*printf("4 elements\n");*/
+        if(atoi(argv[1]) == 0){
+            printf("Invalid Input!\n");
+            return 1;
+        }
         return kmeans(atoi(argv[1]), DEFAULT_ITER, argv[2], argv[3]);
     }
     else if(argc == 5){
         /*printf("5 elements\n");*/
+        if(atoi(argv[1]) == 0 || atoi(argv[2]) == 0){
+            printf("Invalid Input!\n");
+            return 1;
+        }
         return kmeans(atoi(argv[1]), atoi(argv[2]), argv[3], argv[4]);
     }
     else{
-        printf("Invalid Input!");
+        printf("Invalid Input!\n");
         return 1;
     }
 
