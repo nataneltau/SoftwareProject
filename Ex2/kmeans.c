@@ -674,6 +674,7 @@ static PyObject* kmeans_capi(PyObject *self, PyObject *args)
 
 
     /*printf("%d", numbersOfLines("test line len.txt", 100));
+    //dont forget!
 
     return 0;*/
 
