@@ -66,18 +66,16 @@ void makeDataDuoble(int line_len, const char *vektor_char, int dimension, double
 
 }/*end of function makeDataDuoble*/
 
-int ftoa(double n, char* res, int afterpoint, int index);/*convert double to string*/
+double calc_dist_double(const double *x, double *centroid, int dimension);/*this function calculate (x-centroid)^2*/
 
-double calc_dist(const char *x, char *centroid, int dimension, int line_len);/*this function calculate (x-centroid)^2*/
-
-int calc_argmin(int k, int line_len, const char *x, char **arr_centroids, int dimension);/*return index j for S_j: argmin*/
+int calc_argmin_double(int k, const double *x, double **arr_centroids, int dimension);/*return index j for S_j: argmin*/
 
 int calcLineLen(char *input_file);/*calculate the maximum line len*/
 
 int numbersOfLines(char *input_file, int line_len);/*return the numbers of lines in the file*/
 
 /*let's build some functions*/
-int euclidean_norm( int k, int line_len, char **arr_centroids, char **arr_prev_centroids, int dimension, int iter_num){/*check condition to while loop in kmeans function*/
+int euclidean_norm_double( int k, double **arr_centroids, double **arr_prev_centroids, int dimension, int iter_num){/*check condition to while loop in kmeans function*/
 
     double tmp;
     int i;
@@ -91,7 +89,7 @@ int euclidean_norm( int k, int line_len, char **arr_centroids, char **arr_prev_c
 
     for(i = 0; i<k; i++){/*each iteration check if there is a centroid which his euclidean norm bigger than 0.001*/
 
-        tmp = calc_dist(arr_prev_centroids[i], arr_centroids[i], dimension, line_len);
+        tmp = calc_dist_double(arr_prev_centroids[i], arr_centroids[i], dimension);
         tmp = fabs(tmp);
         tmp = sqrt(tmp);
 
@@ -106,24 +104,14 @@ int euclidean_norm( int k, int line_len, char **arr_centroids, char **arr_prev_c
 }/*end of function euclidean_norm*/
 
 /*this func calculate the new centroids, like line6 in the alg in ex1*/
-void update_centroids(double clus_len, int line_len, int data_num, char **cluster, int dimension, char *str_centroid_buffer){
+void update_centroids(double clus_len, double **cluster, int dimension, double *arr_centroid){
 
     double *the_new_centroid;
-    char *tmp_buffer;
-    double *clus_double;
-    int m, i, j, n, k, l;
-    int index, last_time;
+    int i, j, n;
 
     the_new_centroid = (double *)calloc(dimension, sizeof(double));
 
     if(!the_new_centroid){/*calloc failed*/
-        printf("An Error Has Occurred\n");
-        exit(1);
-    }
-
-    clus_double = (double *)calloc(dimension, sizeof(double));
-
-   if(!clus_double){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
@@ -133,31 +121,11 @@ void update_centroids(double clus_len, int line_len, int data_num, char **cluste
         exit(1);
     }/*end of if*/
 
-    if(data_num > 0){/*for compiler*/
-        l = 1;
-    }
-
-    for(l =0; l<dimension; l++){/*initialization*/
-        the_new_centroid[l]=0;
-    }/*end of for*/
-
-
     for(i=0; i<clus_len; i++){/*sum each coordinate for all the vektors in the cluster*/
-
-        free(clus_double);
-        clus_double = (double *)calloc(dimension, sizeof(double));
-
-        if(!clus_double){/*calloc failed*/
-            printf("An Error Has Occurred\n");
-            exit(1);
-        }
-
-        makeDataDuoble(line_len, cluster[i], dimension, clus_double);
-
 
         for(j=0; j<dimension; j++){
 
-            the_new_centroid[j] += clus_double[j];
+            the_new_centroid[j] += cluster[i][j];
 
         }/*end of inner for*/
 
@@ -168,139 +136,78 @@ void update_centroids(double clus_len, int line_len, int data_num, char **cluste
         the_new_centroid[n] = the_new_centroid[n] / clus_len;
     }/*end of for*/
 
-    index = 0;
-    last_time = 0;
-
-
-    tmp_buffer = (char *)calloc(line_len, sizeof(char));
-
-    if(!tmp_buffer){/*calloc failed*/
-        printf("An Error Has Occurred\n");
-        exit(1);
-    }
-
-    /*memset(tmp_buffer, 0, sizeof(tmp_buffer));*/
-
-
-    for(k = 0; k<dimension-1; k++){/*convert the new centroid to a string*/
-        /*index = ftoa(the_new_centroid[k], str_centroid_buffer, 4, index);
-        /str_centroid_buffer[index] = ',';
-        /index++;*/
-
-        index = sprintf(tmp_buffer, "%.4f,", the_new_centroid[k]);
-
-        /*printf("the tmp_buffer: %s\n", tmp_buffer);*/
-
-        for(m = 0; m<index; m++){
-            str_centroid_buffer[m+last_time] = tmp_buffer[m];
-        }
-        /*printf("the str_centroid_buffer: %s\n", str_centroid_buffer);*/
-        last_time += index;
-
-    }/*end of for*/
-
-    /*index = ftoa(the_new_centroid[dimension-1], str_centroid_buffer, 4, index);*/
-    index = sprintf(tmp_buffer, "%.4f", the_new_centroid[dimension-1]);
-
-        /*printf("the tmp_buffer: %s\n", tmp_buffer);*/
-
-        for(m = 0; m<index; m++){
-            str_centroid_buffer[m+last_time] = tmp_buffer[m];
-        }
-        /*printf("the str_centroid_buffer: %s\n", str_centroid_buffer);*/
-        last_time += index;
-    str_centroid_buffer[last_time] = '\0';
-    /*printf("the final!!!: %s\n", str_centroid_buffer);*/
-
-    free(clus_double);
+    memcpy(arr_centroid, the_new_centroid, dimension*sizeof(double));
+    
     free(the_new_centroid);
-    free(tmp_buffer);
 
 }/*end of function update_centroids*/
 
-int kmeans(int k, int max_iter, int eps, char *input_file, char *output_file){//should write the k wanted centroid at the start of the file
+/*tested on input, worked right*/
+double** kmeans_double(int k, int max_iter, int eps, double** mat, int row, int dimension){//should write the k wanted centroid at the start of the file
 
     int iter_num = 0;
-    char *buff;
-    char **data_points;
-    int dimension=0;
-    char **arr_centroids;
-    char **arr_prev_centroids;
-    char ***arr_clusters;
+    double *buff;
+    double **arr_centroids;
+    double **arr_prev_centroids;
+    double ***arr_clusters;
     int *index_for_cluster_k;
     int f, j, i, m, l;
     int index_to_cluster;
-    char *str_centroid_buffer;
-    char *the_index_of_cent;
-    FILE *fr, *fw, *fwr;
-    int line_len;
-    int data_num;
-    int line_len_1 = calcLineLen(input_file);
-    int line_len_2 = calcLineLen(output_file);
+    double *str_centroid_buffer;
+    double *the_index_of_cent;
+
+    /*
+        I replaced data_num in rows,
+            line_len in dimension,
+            data_points in mat
     
-    if(line_len_1>line_len_2){
-        line_len = line_len_1;
-    }
-    else{
-        line_len = line_len_2;
-    }
-
-    data_num = numbersOfLines(input_file, line_len);
-
+    */
 
 
     epsi = eps;
 
 
-    if(line_len <= 0 || data_num <= 0 || k <= 0 || max_iter <= 0){
+    if(row <= 0 || dimension <= 0 || k <= 0 || max_iter <= 0){
         printf("Invalid Input!\n");
         exit(1);
     }
 
-    str_centroid_buffer = (char *)calloc(line_len, sizeof(char));
+    str_centroid_buffer = (double *)calloc(dimension, sizeof(double));
 
     if(!str_centroid_buffer){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
-    buff = (char *)calloc(line_len, sizeof(char));
+    buff = (double *)calloc(dimension, sizeof(double));
 
     if(!buff){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
-    data_points = (char **)calloc(data_num, sizeof(char*));
-
-    if(!data_points){/*calloc failed*/
-        printf("An Error Has Occurred\n");
-        exit(1);
-    }
-
-
-    arr_centroids = (char **)calloc(k, sizeof(char*));
+    arr_centroids = (double **)calloc(k, sizeof(double*));
 
     if(!arr_centroids){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
-    the_index_of_cent = (char *)calloc(k, sizeof(char*));
+    the_index_of_cent = (double *)calloc(k, sizeof(double*));
 
     if(!the_index_of_cent){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
-    arr_prev_centroids = (char **)calloc(k, sizeof(char*));
+    arr_prev_centroids = (double **)calloc(k, sizeof(double*));
 
     if(!arr_prev_centroids){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
-    arr_clusters = (char ***)calloc(k, sizeof(char**));
+    arr_clusters = (double ***)calloc(k, sizeof(double**));
 
     if(!arr_clusters){/*calloc failed*/
         printf("An Error Has Occurred\n");
@@ -316,43 +223,35 @@ int kmeans(int k, int max_iter, int eps, char *input_file, char *output_file){//
 
     /*memset(buff, 0, sizeof(buff));*/
 
-    for(f=0; f<data_num; f++){
+    for(f=0; f<k; f++){
         /*memset(data_points[k], 0, sizeof(data_points[k]));*/
-        data_points[f] = (char *)calloc(line_len, sizeof(char));
-
-        if(!data_points[f]){/*calloc failed*/
-            printf("An Error Has Occurred\n");
-            exit(1);
-        }
-
-        if(f<k){
           
-            arr_centroids[f] = (char *)calloc(line_len, sizeof(char));
+            arr_centroids[f] = (double *)calloc(dimension, sizeof(double));
 
             if(!arr_centroids[f]){/*calloc failed*/
                 printf("An Error Has Occurred\n");
                 exit(1);
             }
 
-            arr_prev_centroids[f] = (char *)calloc(line_len, sizeof(char));
+            arr_prev_centroids[f] = (double *)calloc(dimension, sizeof(double));
 
             if(!arr_prev_centroids[f]){/*calloc failed*/
                 printf("An Error Has Occurred\n");
                 exit(1);
             }
 
-            arr_clusters[f] = (char **)calloc(data_num, sizeof(char*));
+            arr_clusters[f] = (double **)calloc(row, sizeof(double*));
 
             if(!arr_clusters[f]){/*calloc failed*/
                 printf("An Error Has Occurred\n");
                 exit(1);
             }
-        }
+        
     }
 
     for(f=0; f<k; f++){
-        for(j =0; j<data_num; j++){
-            arr_clusters[f][j] = (char *)calloc(line_len, sizeof(char));
+        for(j =0; j<row; j++){
+            arr_clusters[f][j] = (double *)calloc(dimension, sizeof(double));
 
             if(!arr_clusters[f][j]){/*calloc failed*/
                 printf("An Error Has Occurred\n");
@@ -362,66 +261,14 @@ int kmeans(int k, int max_iter, int eps, char *input_file, char *output_file){//
         }
     }
     
-    fr = fopen(input_file, "r");
 
-    if(fr == NULL){
-        printf("Invalid Input!\n");
-        exit(1);
+    for(i=0; i<k; i++){
+
+        memcpy(arr_centroids[i], mat[i], dimension * sizeof(double));
     }
 
-    i = 0;
 
-    while(fscanf(fr, "%s", buff) == 1 ){/*copy each line in the input_file to data_points*/
-
-        /*scanf(*(data_points+i*line_len), buff);*/
-        strncpy(data_points[i], buff, line_len);/*maybe use strncpy ?*/
-        i++;
-
-    }/*end of while*/
-
-    for(i=0; i<line_len+1; i++){
-        /*count the numbers of commas, the dimension is the number
-        of commas + 1*/
-        if(data_points[0][i] == ','){
-            dimension++;
-        }/*end of if*/
-
-    }/*end of for*/
-
-    dimension++;
-
-    /*printf("data_ point: %s\n", data_points[0]);*/
-
-    fclose(fr);
-
-    fwr = fopen(output_file, "r");
-
-    if(fwr == NULL){
-        printf("Invalid Input!\n");
-        exit(1);
-    }
-
-    if(fscanf(fwr, "%s", buff) == 1){
-        strncpy(the_index_of_cent, buff, line_len);
-    }
-
-    i=0;
-
-    while(fscanf(fwr, "%s", buff) == 1 ){/*Initializing the first centroids*/
-
-        /*scanf(*(data_points+i*line_len), buff);*/
-        strncpy(arr_centroids[i], buff, line_len);
-        i++;
-
-    }/*end of while*/
-
-
-    fclose(fwr);
-
-    fw = fopen(output_file, "w");
-
-
-    while((iter_num != max_iter) && !(euclidean_norm(k,  line_len, arr_centroids, arr_prev_centroids, dimension, iter_num))){
+    while((iter_num != max_iter) && !(euclidean_norm_double(k, arr_centroids, arr_prev_centroids, dimension, iter_num))){
         
         
         
@@ -434,20 +281,20 @@ int kmeans(int k, int max_iter, int eps, char *input_file, char *output_file){//
 
         for(l = 0; l<k; l++){/*copy each vektor in arr_centroids to arr_prev_centroids for the euclidean_norm func*/
 
-            strncpy(arr_prev_centroids[l], arr_centroids[l], line_len);/*maybe use strncpy ?*/
+            memcpy(arr_prev_centroids[l], arr_centroids[l], dimension * sizeof(double));
 
         }/*end of for*/
         
         /*printf("dat: %s\n", arr_centroids[0]);
         printf("dat: %s\n", arr_centroids[1]);
         printf("dat: %s\n", arr_centroids[2]);*/
-        
-        for(i=0; i<data_num; i++){/*after this for, in arr_cluster[i] there is all the x_j that u_i is their closest centroid*/
+   
+        for(i=0; i<row; i++){/*after this for, in arr_cluster[i] there is all the x_j that u_i is their closest centroid*/
 
             
-            index_to_cluster = calc_argmin(k, line_len, data_points[i], arr_centroids, dimension);
+            index_to_cluster = calc_argmin_double(k, mat[i], arr_centroids, dimension);
 
-            strncpy(arr_clusters[index_to_cluster][index_for_cluster_k[index_to_cluster]], data_points[i], line_len );/*maybe use strncpy ?*/
+            memcpy(arr_clusters[index_to_cluster][index_for_cluster_k[index_to_cluster]], mat[i], dimension * sizeof(double) );
 
             /*printf("this: %s\n", arr_clusters[index_to_cluster][index_for_cluster_k[index_to_cluster]]);*/
             index_for_cluster_k[index_to_cluster]++;
@@ -461,7 +308,7 @@ int kmeans(int k, int max_iter, int eps, char *input_file, char *output_file){//
         for(j=0; j<k; j++){/*this for is equal to the for in line 5 in the alg in ex1*/
 
             free(str_centroid_buffer);
-            str_centroid_buffer = (char *)calloc(line_len, sizeof(char));
+            str_centroid_buffer = (double *)calloc(dimension, sizeof(double));
 
             if(!str_centroid_buffer){
                 printf("An Error Has Occurred\n");
@@ -472,9 +319,8 @@ int kmeans(int k, int max_iter, int eps, char *input_file, char *output_file){//
 
             /*printf("this: %s\n", arr_clusters[j][0]);*/
 
-            update_centroids(index_for_cluster_k[j], line_len, data_num, arr_clusters[j], dimension, str_centroid_buffer);
+            update_centroids(index_for_cluster_k[j], arr_clusters[j], dimension, arr_centroids[j]);
 
-            strcpy(arr_centroids[j], str_centroid_buffer);/*maybe use strncpy ?*/
         }/*end of for*/
         /*and the writing to file after it*/
 
@@ -487,54 +333,51 @@ int kmeans(int k, int max_iter, int eps, char *input_file, char *output_file){//
 
 
     /*printf("number of iter: %d\n", iter_num);*/
-    fprintf(fw, "%s\n", the_index_of_cent);
 
     for(i=0; i<k; i++){/*write to file the centroids*/
         
-        fprintf(fw, "%s\n", arr_centroids[i]);
+        for(j=0; j<dimension; j++){
+
+            fprintf(stdout, "%.4f, ", arr_centroids[i][j]);
+        }
+
+        fprintf(stdout, "%.4f\n", arr_centroids[i][dimension-1]);
 
     }/*end of for*/
 
-    fclose(fw);
-
-
     for(f=0; f<k; f++){
-        for(j =0; j<data_num; j++){
+        for(j =0; j<row; j++){
             free(arr_clusters[f][j]);
 
         }
     }
 
 
-    for(f=0; f<data_num; f++){
+    for(f=0; f<k; f++){
         /*memset(data_points[k], 0, sizeof(data_points[k]));*/
-        free(data_points[f]);
 
-        if(f<k){
-          
-            free(arr_centroids[f]);
+        free(arr_centroids[f]);
 
-            free(arr_prev_centroids[f]);
+        free(arr_prev_centroids[f]);
 
-            free(arr_clusters[f]);
+        free(arr_clusters[f]);
 
-        }
+        
     }
 
 
 
     free(buff);
-    free(data_points);
     free(arr_centroids);
     free(arr_prev_centroids);
     free(arr_clusters);
-    /*free(index_for_cluster_k);*/
+    free(index_for_cluster_k);
     free(str_centroid_buffer);
-    /*free(the_index_of_cent);*/
+    free(the_index_of_cent);
 
-    return 0;/*the run complete succesfuly*/
+    return arr_centroids;/*the run complete succesfuly*/
 
-}/*end of kmeans function*/
+}/*end of kmeans_double function*/
 
 
 int calcLineLen(char *input_file){
@@ -617,17 +460,17 @@ int numbersOfLines(char *input_file, int line_len){
 
 }/*end of function numbersOfLines*/
 
-int calc_argmin(int k, int line_len, const char *x, char **arr_centroids, int dimension){
+int calc_argmin_double(int k, const double *x, double **arr_centroids, int dimension){
 
      /*printf("centroid at start argmin: %s\n", arr_centroids[1]);*/
-    double min_centr = calc_dist(x, arr_centroids[0], dimension, line_len);
+    double min_centr = calc_dist_double(x, arr_centroids[0], dimension);
     int index_cluster = 0;
     double tmp = min_centr + 1;
     int i;
 
     for(i=1; i<k; i++){/*the for calc (x-u_i)^2 when u_i == arr_centroids[i], and at the end min_centr == argmin(x-u_i)^2 and index_cluster == i*/
         /*printf("centroid send to calc_dist: %s\n", arr_centroids[i]);*/
-        tmp = calc_dist(x, arr_centroids[i], dimension, line_len);
+        tmp = calc_dist_double(x, arr_centroids[i], dimension);
 
         if(tmp < min_centr){
             min_centr = tmp;
@@ -642,47 +485,26 @@ int calc_argmin(int k, int line_len, const char *x, char **arr_centroids, int di
 
 }/*end of function calc_argmin*/
 
-double calc_dist(const char *x, char *centroid, int dimension, int line_len){/*calculate (x-centroid)^2*/
+double calc_dist_double(const double *x, double *centroid, int dimension){/*calculate (x-centroid)^2*/
 
-    double *x_double;
-    double *centroid_double;
     double tmp, sum;
     int i;
     sum = 0.0;
     tmp = 0.0;
     
-    x_double = (double *)calloc(line_len, sizeof(double));
-
-    if(!x_double){
-        printf("An Error Has Occurred\n");
-        exit(1);
-    }
-
-    centroid_double = (double *)calloc(line_len, sizeof(double));
-
-    if(!centroid_double){
-        printf("An Error Has Occurred\n");
-        exit(1);
-    }
-
+   
     /*printf("to makeDataDuoblre: %s\n", centroid);*/
 
     /*memset(x_double, 0, sizeof(x_double));
     memset(centroid_double, 0, sizeof(centroid_double));*/
 
-    makeDataDuoble(line_len, x, dimension, x_double);/*convert from string to double*/
-    makeDataDuoble(line_len, centroid, dimension, centroid_double);/*convert from string to double*/
-
     for(i = 0; i<dimension; i++){/*calculate (x-centroid)^2 for each coordinate and sum them all*/
 
-        tmp = x_double[i]-centroid_double[i];
+        tmp = x[i]-centroid[i];
         tmp = pow(tmp, 2);
         sum += tmp;
 
-    }/*end of for*/
-
-    free(x_double);
-    free(centroid_double);
+    }
 
     return sum;
 
@@ -734,46 +556,6 @@ int find_k(double **mat, int N){
     }
     return res + 1;
 }
-
-int calcLineLen(char *input_file){
-    FILE *fr = fopen(input_file, "r");
-    int line_len = 0;
-    int max_line = -1;
-
-    if(fr == NULL){
-        printf("Invalid Input!\n");
-        exit(1);
-    }
-
-    while(!(feof(fr))){/*search the maximum line len */
-
-        line_len = 0;
-
-        while(fgetc(fr) != '\n'){
-
-        line_len++;
-        if(feof(fr)){
-            break;
-        }
-
-        }/*end of inner while*/
-
-        if(max_line < line_len){
-            max_line = line_len;
-        }
-
-        /*if(feof(fr)){
-            break;
-        }*/
-
-    }/*end of while*/
-
-    max_line++;
-
-    return max_line;
-
-}/*end of function calcLineLen*/
-
 
 double **new_mat(int N){
     double **mat;
@@ -1488,11 +1270,13 @@ int main(){
     char *file_name;
     int *size, k;
     double **mat, **jacobi_mat, **wam_mat, **ddg_mat, **ddg_sqrt;
-    file_name = "tmpFile.txt";
+    file_name = "input_1.txt";
     size = mat_size(file_name);
     mat = get_mat(file_name, size[0], size[1]);
 
-    wam_mat = wam_func(mat, size[0], size[1]);
+    kmeans_double(3, 600, 0.1, mat, size[0], size[1]);
+
+    /*wam_mat = wam_func(mat, size[0], size[1]);
     ddg_mat = ddg_func(mat, size[0], size[1]);
     ddg_sqrt = calc_mat_sqrt(ddg_mat, size[0]);
     /*k = heuristic(mat, size[0], size[1]);*/
@@ -1501,7 +1285,7 @@ int main(){
     /*test_wam();*/
 
     //jacobi_mat = jacobi_func(mat, size[0]);
-    printf("wam_mat: \n");
+    /*printf("wam_mat: \n");
     print_mat(wam_mat, size[0]);
 
     printf("\n");
@@ -1516,7 +1300,7 @@ int main(){
 
     printf("\n");
 
-    test_jacoby();
+    test_jacoby();*/
 
     return 0;
 }
