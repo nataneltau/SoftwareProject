@@ -607,16 +607,19 @@ double *test_ctopy(){
 
 int *mat_size(char *file_name){
     int *res, rows, columns, i;
-    char line[50] = "";
+    char *line;
+    int line_len;
     FILE *fr;
     rows = 0;
     columns = 0;
+    line_len = calcLineLen(file_name);
+    line = (char *)calloc( line_len, sizeof(char));
     fr = fopen(file_name, "r");
     if(fr == NULL){
         printf("Invalid Input!\n");
         exit(1);
     }
-    fgets(line, 50, fr);
+    fgets(line, line_len, fr);
     rows++;
     i = 0;
     while(line[i] != '\0'){
@@ -628,11 +631,12 @@ int *mat_size(char *file_name){
     columns++;
 
 
-    while (fgets(line, 50, fr) != NULL) {
+    while (fgets(line, line_len, fr) != NULL) {
         rows += 1;
     }
 
     fclose(fr);
+    rows = numbersOfLines(file_name, line_len);
 
     res = calloc(2, sizeof(int));
 
@@ -647,7 +651,8 @@ double **get_mat(char *file_name, int rows, int columns){
     double **mat;
     int i, j;
     int max_chars_in_line;
-    char line[50], *token;
+    double temp;
+    char line[(columns+1)*sizeof(double)], *token;
     FILE *fr;
 
     /*max_chars_in_line = calcLineLen( file_name);
@@ -673,12 +678,13 @@ double **get_mat(char *file_name, int rows, int columns){
     }
     i = 0;
 
-    while (fgets(line, (columns+1)*sizeof(double), fr) != NULL) {
+    while (fgets(line, (columns+1)*sizeof(double), fr) != NULL && i<rows) {
         j = 0;
         token = strtok(line, ",");
 
         while (token != NULL && j<columns){
-            mat[i][j] = strtod(token, NULL);
+            temp = strtod(token, NULL);
+            mat[i][j] = temp;
             token = strtok(NULL, ",");
             j++;
         }
@@ -1252,15 +1258,94 @@ double ** file_to_mat(char* filename){
     FILE *fr;
     int *row_and_col;
     double **res_mat;
-    int i;
+    char *buff;
+    char **data_points;
+    int i, f;
+    int dimension = 0;
+    int line_len = calcLineLen(filename);
+    int data_num = numbersOfLines(filename, line_len);
 
-    row_and_col = mat_size(filename);
+    data_points = (char **)calloc(data_num, sizeof(char*));
+
+    if(!data_points){/*calloc failed*/
+        printf("An Error Has Occurred\n");
+        exit(1);
+    }
+
+    buff = (char *)calloc(line_len, sizeof(char));
+
+    if(!buff){/*calloc failed*/
+        printf("An Error Has Occurred\n");
+        exit(1);
+    }
+
+    for(f=0; f<data_num; f++){
+        /*memset(data_points[k], 0, sizeof(data_points[k]));*/
+        data_points[f] = (char *)calloc(line_len, sizeof(char));
+
+    }/*end of for*/
+
+    fr = fopen(filename, "r");
+
+    if(fr == NULL){
+        printf("Invalid Input!\n");
+        exit(1);
+    }
+
+    i=0;
+
+    while(fscanf(fr, "%s", buff) == 1 ){/*copy each line in the input_file to data_points*/
+
+        /*scanf(*(data_points+i*line_len), buff);*/
+        strncpy(data_points[i], buff, line_len);/*maybe use strncpy ?*/
+        i++;
+
+    }/*end of while*/
+
+    for(i=0; i<line_len+1; i++){
+        /*count the numbers of commas, the dimension is the number
+        of commas + 1*/
+        if(data_points[0][i] == ','){
+            dimension++;
+        }/*end of if*/
+
+    }/*end of for*/
+
+    dimension++;
+
+    /*row_and_col = mat_size(filename);
 
     int num_of_cord = row_and_col[1];
-    int data_num = row_and_col[0];
+    int data_num = row_and_col[0];*/
 
-    res_mat = get_mat(filename, data_num, num_of_cord);
+    /*res_mat = get_mat(filename, data_num, num_of_cord);*/
+
+    res_mat = (double **)calloc(data_num, sizeof(double*));
+
+    for(i=0; i<data_num; i++){
+
+        res_mat[i] = (double *)calloc(dimension, sizeof(double));
+
+        if(!res_mat[i]){/*calloc failed*/
+            printf("An Error Has Occurred\n");
+            exit(1);
+        }
+
+        makeDataDuoble(line_len, data_points[i], dimension, res_mat[i]);
+
+    }
+
     return res_mat;
+}
+
+void print_mat_normal(double **mat, int row, int col){
+    int i, j;
+    for (i = 0; i < row; i++){
+        for (j = 0; j < col-1; j++){
+            printf("%.4f, ", mat[i][j]);
+        }
+        printf("%.4f\n", mat[i][col-1]);
+    }
 }
 
 
@@ -1269,23 +1354,25 @@ int main(){
 
     char *file_name;
     int *size, k;
-    double **mat, **jacobi_mat, **wam_mat, **ddg_mat, **ddg_sqrt;
-    file_name = "input_1.txt";
+    double **mat, **jacobi_mat, **wam_mat, **ddg_mat, **ddg_sqrt, **lnorm_mat;
+    file_name = "tmpFile.txt";
     size = mat_size(file_name);
-    mat = get_mat(file_name, size[0], size[1]);
-
-    kmeans_double(3, 600, 0.1, mat, size[0], size[1]);
+    //mat = get_mat(file_name, size[0], size[1]);
+    mat = file_to_mat(file_name);
+    print_mat_normal(mat, size[0], size[1]);
+    /*kmeans_double(3, 600, 0.1, mat, size[0], size[1]);*/
 
     /*wam_mat = wam_func(mat, size[0], size[1]);
     ddg_mat = ddg_func(mat, size[0], size[1]);
     ddg_sqrt = calc_mat_sqrt(ddg_mat, size[0]);
+    lnorm_mat = lnorm_func(mat, size[0], size[1]);
     /*k = heuristic(mat, size[0], size[1]);*/
 
     //printf("k = %d", k);
     /*test_wam();*/
 
-    //jacobi_mat = jacobi_func(mat, size[0]);
-    /*printf("wam_mat: \n");
+    /*jacobi_mat = jacobi_func(mat, size[0]);
+    printf("wam_mat: \n");
     print_mat(wam_mat, size[0]);
 
     printf("\n");
@@ -1297,6 +1384,11 @@ int main(){
 
     printf("ddg_sqrt: \n");
     print_mat(ddg_sqrt, size[0]);
+
+    printf("\n");
+
+    printf("lnorm_mat: \n");
+    print_mat(lnorm_mat, size[0]);
 
     printf("\n");
 
