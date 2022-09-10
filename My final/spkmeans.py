@@ -63,7 +63,46 @@ def kmeans_plus_plus(k, max_iter, eps, file_name):
         for element in the_lines_to_print:
             print(element)
 
-def cal_jacobi(k, file_name):
+
+def get_mat_size(input_file):
+
+    try:
+        fr = open(input_file, "r")
+    except OSError:
+        print("Invalid Input!\n")
+        return  
+    
+    try:
+        inp_txt = fr.read()
+        data_points = inp_txt.split("\n")
+        data_num = len(data_points)
+        tmp = data_points[0].split(",")
+        dimension = len(tmp)
+    except:
+        print("An Error Has Occurred\n")
+        return
+
+    if(dimension <= 0 or data_num <=0 or k <= 0 or max_iter <= 0):
+        print("Invalid Input!\n")
+        fr.close()
+        return
+        
+
+
+    fr.close()
+    return data_num, dimension #data_num is the number of rows, dimension is the number of colmnus
+
+def make_double_mat(file_name):
+    return kpp.file_to_mat(file_name)
+
+
+def wam_func(file_name):
+    row, col = get_mat_size(file_name)
+    mat = make_double_mat(file_name)
+    return kpp.wam(mat, row, col)
+
+
+def jacobi_func(file_name):
     pass
 
 
@@ -74,6 +113,15 @@ def cal_matrix(k, goal, file_name):
 if __name__ == '__main__':
 
     args = sys.argv  # args[0] = k, args[1] = goal, args[2] = file_name
+
+    try:
+        if len(args) != 3:#invalid
+            print("Invalid Input!\n")
+        else:
+            if(int(args[1]) == 0):#this cause the error cause there is nothing to the if block
+    except:
+        pass
+
 
     try:
         fr = open("tmpFile.txt", "r")

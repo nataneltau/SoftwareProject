@@ -1253,7 +1253,7 @@ void test_lnorm(){
 /*}/*end of function numbersOfLines*/
 
 
-
+/*Tested, works right, read the file and make double matrix from it*/
 double ** file_to_mat(char* filename){
     FILE *fr;
     int *row_and_col;

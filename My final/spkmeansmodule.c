@@ -41,6 +41,7 @@ double **c_mat(PyObject *float_mat){
     }
     row = PyList_GetItem(float_mat, 0);
     columns = (int)PyObject_Length(row);
+    
     mat = (double **) malloc(sizeof(double *) * rows);
     for (i = 0; i < rows; i++){
         mat[i] = (double *) malloc(sizeof(double) * columns);
@@ -80,6 +81,25 @@ int *mat_sizei(PyObject *float_mat){
  * This is a requirement for all functions and methods in the C API.
  * It has input PyObject *args from Python.
  */
+static PyObject* wam_funci(PyObject *self, PyObject *args){
+    PyObject *float_mat;
+    double **mat;
+    double res_size[2];
+    int row, col;
+
+    if (!PyArg_ParseTuple(args, "Oii", &float_mat, &row, &col)){
+        return NULL;
+    }
+
+    mat = c_mat(float_mat);
+    res_size[0] = row;
+    res_size[1] = col;
+    return GetMat(wam_func(mat, row, col), res_size);
+
+
+}/*end of wam_funci function*/
+
+
 static PyObject* wam_capi(PyObject *self, PyObject *args)
 {
     double **mat;
