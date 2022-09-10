@@ -59,7 +59,7 @@ double **c_mat(PyObject *float_mat){
 
 }
 
-int *mat_size(PyObject *float_mat){
+int *mat_sizei(PyObject *float_mat){
     int rows, columns, *size;
     PyObject *row;
 
@@ -91,12 +91,12 @@ static PyObject* wam_capi(PyObject *self, PyObject *args)
     }
 
     mat = c_mat(float_mat);
-    size = mat_size(float_mat);
+    size = mat_sizei(float_mat);
     res_size = (int *) malloc(sizeof(int) * 2);
     res_size[0] = size[0];
     res_size[1] = size[0];
 
-    return GetMat(wam(mat, size[0], size[1]), res_size);
+    return GetMat(wam_func(mat, size[0], size[1]), res_size);
 }
 
 static PyObject* ddg_capi(PyObject *self, PyObject *args)
@@ -110,12 +110,12 @@ static PyObject* ddg_capi(PyObject *self, PyObject *args)
     }
 
     mat = c_mat(float_mat);
-    size = mat_size(float_mat);
+    size = mat_sizei(float_mat);
     res_size = (int *) malloc(sizeof(int) * 2);
     res_size[0] = size[0];
     res_size[1] = size[0];
 
-    return GetMat(ddg(mat, size[0], size[1]), res_size);
+    return GetMat(ddg_func(mat, size[0], size[1]), res_size);
 }
 
 static PyObject* lnorm_capi(PyObject *self, PyObject *args)
@@ -129,7 +129,7 @@ static PyObject* lnorm_capi(PyObject *self, PyObject *args)
     }
 
     mat = c_mat(float_mat);
-    size = mat_size(float_mat);
+    size = mat_sizei(float_mat);
     res_size = (int *) malloc(sizeof(int) * 2);
     res_size[0] = size[0];
     res_size[1] = size[0];
@@ -137,7 +137,7 @@ static PyObject* lnorm_capi(PyObject *self, PyObject *args)
 /* This builds the answer ("d" = Convert a C double to a Python floating point number) back into a python object */
     /*return Py_BuildValue("d", test_ctopy(d));*/ /*  Py_BuildValue(...) returns a PyObject*  */
 
-    return GetList(wam(file_name), mat_size(file_name));
+    return GetMat(lnorm_func(mat, size[0], size[1]), res_size);
 }
 
 

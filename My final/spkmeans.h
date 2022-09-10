@@ -1,6 +1,5 @@
-
-#ifndef _spkmeans_h
-#define _spkmeans_h
+#ifndef SPKMEANS_H_
+#define SPKMEANS_H_
 
 double *test_ctopy();
 
