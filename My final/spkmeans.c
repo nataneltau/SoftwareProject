@@ -673,11 +673,11 @@ double **get_mat(char *file_name, int rows, int columns){
     }
     i = 0;
 
-    while (fgets(line, 50, fr) != NULL) {
+    while (fgets(line, (columns+1)*sizeof(double), fr) != NULL) {
         j = 0;
         token = strtok(line, ",");
 
-        while (token != NULL){
+        while (token != NULL && j<columns){
             mat[i][j] = strtod(token, NULL);
             token = strtok(NULL, ",");
             j++;
