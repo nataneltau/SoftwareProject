@@ -14,56 +14,6 @@ class goal(enum.Enum):
     jacobi = 5
 
 
-def calc_DL(row, centroids, cor_num):
-    min_diff = sys.maxsize
-    for centroid in centroids:
-        diff = 0
-        for j in range(cor_num):
-            diff += ((row[j] - centroid['x_' + str(j)]) ** 2)
-        if diff < min_diff:
-            min_diff = diff
-    return min_diff
-
-
-def kmeans_plus_plus(k, max_iter, eps, file_name):
-    with open(file_name) as f:
-        content = f.read()
-        cor_num = len(content.split("\n")[0].split(","))
-        N = len(content.split("\n"))
-
-    lst_centroids = []
-    centroids_indices = []
-    nodes = pd.read_csv(file_name, header=None, )
-    np.random.seed(0)
-    indexes = [i for i in range(N - 1)]
-    index = np.random.choice(indexes)
-    centroid = nodes.loc[index]
-    lst_centroids.append(centroid)
-    centroids_indices.append(index)
-
-    for i in range(1, k):
-        nodes['D'] = nodes.apply(lambda row: calc_DL(row, lst_centroids, cor_num), axis=1)
-        sum_D = nodes['D'].sum()
-
-        nodes['P'] = nodes['D'].apply(lambda dl: dl / sum_D)
-
-        key = np.random.choice(nodes.index.values, p=nodes['P'])
-        lst_centroids.append(nodes.loc[key])
-        centroids_indices.append(key)
-
-    kpp_res = kpp.fit(k, max_iter, eps, "my_nice_output.txt")   # result will be written to output
-
-    if kpp_res != 0:
-        print("An Error Has Occurred")
-        sys.exit()
-
-    with open("my_nice_output.txt") as outputf:
-        outputf_read = outputf.read()
-        the_lines_to_print = outputf_read.split("\n")
-        for element in the_lines_to_print:
-            print(element)
-
-
 def get_mat_size(input_file):
 
     try:
@@ -82,24 +32,34 @@ def get_mat_size(input_file):
         print("An Error Has Occurred\n")
         return
 
-    if(dimension <= 0 or data_num <=0 or k <= 0 or max_iter <= 0):
+    if(dimension <= 0 or data_num <=0):
         print("Invalid Input!\n")
         fr.close()
         return
         
-
-
     fr.close()
     return data_num, dimension #data_num is the number of rows, dimension is the number of colmnus
 
 def make_double_mat(file_name):
-    return kpp.file_to_mat(file_name)
+    return kpp.file_to_mat_capi(file_name) #return list of lists
 
 
 def wam_func(file_name):
     row, col = get_mat_size(file_name)
     mat = make_double_mat(file_name)
-    return kpp.wam(mat, row, col)
+    return kpp.wam_capi(mat, row, col)
+
+def ddg_func(file_name):
+    row, col = get_mat_size(file_name)
+    mat = make_double_mat(file_name)
+    return kpp.ddg_capi(mat, row, col)
+
+def lnorm_func(file_name):
+    row, col = get_mat_size(file_name)
+    mat = make_double_mat(file_name)
+    return kpp.lnorm_capi(mat, row, col)
+
+#/*these 3 I need to add to the module need also add their functions*/
 
 
 def jacobi_func(file_name):
@@ -167,3 +127,61 @@ if __name__ == '__main__':
     except:
         pass
         """
+
+
+
+"""
+SOME FUNCTIONS, NOT SURE NEEDED
+
+
+def calc_DL(row, centroids, cor_num):
+    min_diff = sys.maxsize
+    for centroid in centroids:
+        diff = 0
+        for j in range(cor_num):
+            diff += ((row[j] - centroid['x_' + str(j)]) ** 2)
+        if diff < min_diff:
+            min_diff = diff
+    return min_diff
+
+
+def kmeans_plus_plus(k, max_iter, eps, file_name):
+    with open(file_name) as f:
+        content = f.read()
+        cor_num = len(content.split("\n")[0].split(","))
+        N = len(content.split("\n"))
+
+    lst_centroids = []
+    centroids_indices = []
+    nodes = pd.read_csv(file_name, header=None, )
+    np.random.seed(0)
+    indexes = [i for i in range(N - 1)]
+    index = np.random.choice(indexes)
+    centroid = nodes.loc[index]
+    lst_centroids.append(centroid)
+    centroids_indices.append(index)
+
+    for i in range(1, k):
+        nodes['D'] = nodes.apply(lambda row: calc_DL(row, lst_centroids, cor_num), axis=1)
+        sum_D = nodes['D'].sum()
+
+        nodes['P'] = nodes['D'].apply(lambda dl: dl / sum_D)
+
+        key = np.random.choice(nodes.index.values, p=nodes['P'])
+        lst_centroids.append(nodes.loc[key])
+        centroids_indices.append(key)
+
+    kpp_res = kpp.fit(k, max_iter, eps, "my_nice_output.txt")   # result will be written to output
+
+    if kpp_res != 0:
+        print("An Error Has Occurred")
+        sys.exit()
+
+    with open("my_nice_output.txt") as outputf:
+        outputf_read = outputf.read()
+        the_lines_to_print = outputf_read.split("\n")
+        for element in the_lines_to_print:
+            print(element)
+
+
+"""

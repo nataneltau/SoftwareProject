@@ -143,7 +143,7 @@ void update_centroids(double clus_len, double **cluster, int dimension, double *
 }/*end of function update_centroids*/
 
 /*tested on input, worked right*/
-double** kmeans_double(int k, int max_iter, int eps, double** mat, int row, int dimension){//should write the k wanted centroid at the start of the file
+double** kmeans_double(int k, int max_iter, int eps, double** mat, int row, int dimension){/*should write the k wanted centroid at the start of the file*/
 
     int iter_num = 0;
     double *buff;
