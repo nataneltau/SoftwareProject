@@ -902,7 +902,7 @@ double **mat_mult3(double **mat1, double ** mat2, double **mat3, int N){
 
 }
 
-double** lnorm_func(double **mat, int N, int dim){
+double** lnorm_func(double **mat, int N, int dim){/*tested on input, works right*/
     double** dia_deg_mat,** wei_adj_mat,** norm;
     double ** mult1,** mult2,** dia_deg_sqrt_mat;
     int i, j;
@@ -1355,8 +1355,51 @@ void print_mat_normal(double **mat, int row, int col){
 int main(int argc, char *argv[]){
 
     /*before sending to the functions need to check validate of each argument*/
+    /*in lnorm and ddg, maybe also wam and jacobi, there is inaccuracies like 0.0006, check
+        if it something needed fix*/
 
+
+    char* goal; 
     char *file_name;
+    int *size, k;
+    double **mat, **mat_to_print;
+    size = mat_size(file_name);
+
+    if(argc == 3){
+        
+        file_name = argv[2];
+        size = mat_size(file_name);/*size[0] is row, size[1] is col*/
+        mat = file_to_mat(file_name);
+        goal = argv[1];/*the enum*/
+
+
+        if (strcmp(goal, "wam") == 0) {
+            mat_to_print = wam_func(mat, size[0], size[1]);
+        }
+        else if (strcmp(goal, "ddg") == 0) {
+            mat_to_print = ddg_func(mat, size[0], size[1]);
+        }
+        else if (strcmp(goal, "lnorm") == 0) {
+            mat_to_print = lnorm_func(mat, size[0], size[1]);
+        }
+        else if (strcmp(goal, "jacobi") == 0) {
+            mat_to_print = jacobi_func(mat, size[0]);
+        }
+        else {
+            printf("Invalid Input!\n");
+            exit(1);
+        }
+
+        print_mat_normal(mat, size[0], size[0]);/*the mat is square matrix*/
+        
+    }/*end of if*/
+    else{
+        printf("Invalid Input!\n");
+        return 1;
+    }
+
+
+    /*char *file_name;
     int *size, k;
     double **mat, **jacobi_mat, **wam_mat, **ddg_mat, **ddg_sqrt, **lnorm_mat;
     file_name = "tmpFile.txt";
@@ -1390,50 +1433,11 @@ int main(int argc, char *argv[]){
     print_mat_normal(lnorm_mat, size[0], size[0]);
 
     printf("\n");
-
+    */
 
 
     /*return kmeans(3, 600, "input_1.txt", "output_1101_cc_001_.txt");*/
-    /*char* goal; 
-    char *file_name;
-    int *size, k;
-    double **mat, **mat_to_print;
-    size = mat_size(file_name);
-
-    if(argc == 3){
-        
-        file_name = argv[2];
-        size = mat_size(file_name);/*size[0] is row, size[1] is col*/
-       /* mat = file_to_mat(file_name);
-        goal = argv[1];/*the enum*/
-
-
-       /* if (strcmp(goal, "wam") == 0) {
-            mat_to_print = wam_func(mat, size[0], size[1]);
-        }
-        else if (strcmp(goal, "ddg") == 0) {
-            mat_to_print = ddg_func(mat, size[0], size[1]);
-        }
-        else if (strcmp(goal, "lnorm") == 0) {
-            mat_to_print = lnorm_func(mat, size[0], size[1]);
-        }
-        else if (strcmp(goal, "jacobi") == 0) {
-            mat_to_print = jacobi_func(mat, size[0]);
-        }
-        else {
-            printf("Invalid Input!\n");
-            exit(1);
-        }
-
-        print_mat_normal(mat, size[0], size[0]);/*the mat is square matrix*/
-        
-    //}/*end of if*/
-    /*else{
-        printf("Invalid Input!\n");
-        return 1;
-    }*/
-
-
+    /*
 
 
 /*

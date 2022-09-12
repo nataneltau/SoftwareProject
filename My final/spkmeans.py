@@ -14,6 +14,10 @@ class goal(enum.Enum):
     jacobi = 5
 
 
+def print_matrix(matrix):
+    for element in matrix:
+        print(element)
+
 def get_mat_size(input_file):
 
     try:
@@ -80,9 +84,11 @@ if __name__ == '__main__':
 
     args = sys.argv  # args[0] = k, args[1] = goal, args[2] = file_name
 
-    row, col = get_mat_size("tmpFile.txt")
+    #row, col = get_mat_size("tmpFile.txt")
 
+    list = [[1.32,2.554,3.55], [2.434,2.34,7.545], [7.5454,9.434,0.4343]]
 
+            
     #need to check print(np.array(wam_func("firsti.txt")))
 
 
