@@ -375,7 +375,7 @@ int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int di
     free(str_centroid_buffer);
     free(the_index_of_cent);
 
-    return 1;/*the run complete succesfuly*/
+    return 0;/*the run complete succesfuly*/
 
 }/*end of kmeans_double function*/
 
@@ -652,7 +652,8 @@ double **get_mat(char *file_name, int rows, int columns){
     int i, j;
     int max_chars_in_line;
     double temp;
-    char line[(columns+1)*sizeof(double)], *token;
+    char /*line[(columns+1)*sizeof(double)],*/ *token;
+    char line[250];
     FILE *fr;
 
     /*max_chars_in_line = calcLineLen( file_name);
@@ -1143,7 +1144,7 @@ void test_jacoby(){
 
     file_name = "jacobi_test.txt";
     size = mat_size(file_name);
-    mat = get_mat(file_name, size[0], size[1]);
+    mat = file_to_mat(file_name);
 
     printf("original mat:\n");
     print_mat(mat, size[0]);
@@ -1264,6 +1265,7 @@ double ** file_to_mat(char* filename){
     int dimension = 0;
     int line_len = calcLineLen(filename);
     int data_num = numbersOfLines(filename, line_len);
+    /*int data_num = mat_size(filename)[0];*/
 
     data_points = (char **)calloc(data_num, sizeof(char*));
 
@@ -1294,10 +1296,10 @@ double ** file_to_mat(char* filename){
 
     i=0;
 
-    while(fscanf(fr, "%s", buff) == 1 ){/*copy each line in the input_file to data_points*/
+    while(fscanf(fr, "%s", buff) == 1 && i<data_num){/*copy each line in the input_file to data_points*/
 
         /*scanf(*(data_points+i*line_len), buff);*/
-        strncpy(data_points[i], buff, line_len);/*maybe use strncpy ?*/
+         strncpy(data_points[i], buff, line_len);/*maybe use strncpy ?*/
         i++;
 
     }/*end of while*/
@@ -1350,7 +1352,91 @@ void print_mat_normal(double **mat, int row, int col){
 
 
 
-int main(){
+int main(int argc, char *argv[]){
+
+    /*before sending to the functions need to check validate of each argument*/
+
+    char *file_name;
+    int *size, k;
+    double **mat, **jacobi_mat, **wam_mat, **ddg_mat, **ddg_sqrt, **lnorm_mat;
+    file_name = "tmpFile.txt";
+    size = mat_size(file_name);
+    mat = file_to_mat(file_name);
+    
+
+    wam_mat = wam_func(mat, size[0], size[1]);
+    ddg_mat = ddg_func(mat, size[0], size[1]);
+    ddg_sqrt = calc_mat_sqrt(ddg_mat, size[0]);
+    lnorm_mat = lnorm_func(mat, size[0], size[1]);
+
+    print_mat_normal(mat, size[0], size[1]);
+
+    printf("wam_mat: \n");
+    print_mat_normal(wam_mat, size[0], size[0]);
+
+    printf("\n");
+
+    printf("ddg_mat: \n");
+    print_mat_normal(ddg_mat, size[0], size[0]);
+
+    printf("\n");
+
+    printf("ddg_sqrt: \n");
+    print_mat_normal(ddg_sqrt, size[0], size[0]);
+
+    printf("\n");
+
+    printf("lnorm_mat: \n");
+    print_mat_normal(lnorm_mat, size[0], size[0]);
+
+    printf("\n");
+
+
+
+    /*return kmeans(3, 600, "input_1.txt", "output_1101_cc_001_.txt");*/
+    /*char* goal; 
+    char *file_name;
+    int *size, k;
+    double **mat, **mat_to_print;
+    size = mat_size(file_name);
+
+    if(argc == 3){
+        
+        file_name = argv[2];
+        size = mat_size(file_name);/*size[0] is row, size[1] is col*/
+       /* mat = file_to_mat(file_name);
+        goal = argv[1];/*the enum*/
+
+
+       /* if (strcmp(goal, "wam") == 0) {
+            mat_to_print = wam_func(mat, size[0], size[1]);
+        }
+        else if (strcmp(goal, "ddg") == 0) {
+            mat_to_print = ddg_func(mat, size[0], size[1]);
+        }
+        else if (strcmp(goal, "lnorm") == 0) {
+            mat_to_print = lnorm_func(mat, size[0], size[1]);
+        }
+        else if (strcmp(goal, "jacobi") == 0) {
+            mat_to_print = jacobi_func(mat, size[0]);
+        }
+        else {
+            printf("Invalid Input!\n");
+            exit(1);
+        }
+
+        print_mat_normal(mat, size[0], size[0]);/*the mat is square matrix*/
+        
+    //}/*end of if*/
+    /*else{
+        printf("Invalid Input!\n");
+        return 1;
+    }*/
+
+
+
+
+/*
 
     char *file_name;
     int *size, k;

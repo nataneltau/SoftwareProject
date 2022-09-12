@@ -15,7 +15,7 @@ double **jacobi_func(double **A, int N);
 
 int heuristic(double **mat, int N, int dim);
 
-/*these I need to add to the module*/
+/*this I need to fix maybe in the module and add to the python file*/
 int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int dimension);
 
 #endif
