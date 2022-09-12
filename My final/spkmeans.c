@@ -1114,17 +1114,122 @@ double **jacobi_func(double **A, int N){/*tested on input, works right*/
 
 }
 
-double **vectors_matrix(double **mat, int N, int k){
+int calc_largest_vec(double **mat, int N){
+
+     /*printf("centroid at start argmin: %s\n", arr_centroids[1]);*/
+    double *zero_vec;
+    double max_centr; 
+    int index_cluster = 1;
+    double tmp;
+    int i;
+
+    zero_vec = (double *)calloc(N, sizeof(double));/*make vectors of zeroes*/
+
+    if(!zero_vec){/*calloc failed*/
+        printf("An Error Has Occurred\n");
+        exit(1);
+    }
+
+    max_centr = calc_dist_double(zero_vec, mat[1], N);
+    tmp = max_centr + 1;
+
+    for(i=2; i<N+1; i++){/*the for calc (x-u_i)^2 when u_i == arr_centroids[i], and at the end min_centr == argmin(x-u_i)^2 and index_cluster == i*/
+        /*printf("centroid send to calc_dist: %s\n", arr_centroids[i]);*/
+        tmp = calc_dist_double(zero_vec, mat[i], N);
+
+        if(tmp > max_centr){
+            max_centr = tmp;
+            index_cluster = i;
+        }/*end of if*/
+
+    }/*end of for*/
+
+    return index_cluster;
+
+    return -1;
+
+}/*end of function calc_argmin*/
+
+/*this function get jacobi matrix*/
+double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1*/
 
     double calc_dist_double(const double *x, double *centroid, int dimension);/*this function calculate (x-centroid)^2*/
 
     double **vec_mat;
+    int i, j;
+    int index, tmp, sum;
 
     vec_mat = (double **)calloc(N, sizeof(double *));
 
-    /*k iterations on mat , any iter find max, put him as col then make him zero, do it until k*/
+    if(!vec_mat){/*calloc failed*/
+        printf("An Error Has Occurred\n");
+        exit(1);
+    }
 
-}
+    for(i=0; i<N; i++){
+        vec_mat[i] = (double *)calloc(k, sizeof(double));
+
+        if(!vec_mat[i]){/*calloc failed*/
+            printf("An Error Has Occurred\n");
+            exit(1);
+        }
+    }/*end of for*/
+
+    for(i = 0; i<k; i++){
+
+        /*choose the first eigenvectors*/
+        /*tmp = mat[0][0];
+        index = 0;
+
+        for(j=1; j<N; j++){
+
+        }*/
+
+        index = calc_largest_vec(mat, N);
+
+        for(j=0; j<N; j++){
+
+            vec_mat[j][i] = mat[index+1][j]; /*letting the largest vector as column*/
+
+        }/*end of inner for*/
+
+        for(j=0; j<N; j++){
+
+            mat[index+1][j] = 0; /*make the largest full of zeroes*/
+
+        }/*end of inner for*/
+
+    }/*end of outer for*/
+
+    /*step 5 of alg, renormalizing each of vec_mat rows*/
+
+    for(i=0; i<N; i++){
+
+        sum =0;
+
+        for(j=0; j<k; j++){
+
+            tmp = vec_mat[i][j];
+            tmp = pow(tmp, 2);
+            sum += tmp;
+
+
+        }/*end of inner for*/
+
+        sum = sqrt(sum);
+
+        for(j=0; j<k; j++){
+
+            vec_mat[i][j] /= sum;
+
+        }/*end of inner for*/
+
+
+    }/*end of outer for*/
+
+    return vec_mat;
+
+}/*end of vectors_matrix function*/
 
 int heuristic(double **mat, int N, int dim){
     double **lnorm_mat, **jacobi_mat;
@@ -1370,7 +1475,7 @@ int main(int argc, char *argv[]){
     /*in lnorm and ddg, maybe also wam and jacobi, there is inaccuracies like 0.0006, check
         if it something needed fix*/
 
-
+    int j;
     char* goal; 
     char *file_name;
     int *size, k;
@@ -1403,6 +1508,13 @@ int main(int argc, char *argv[]){
         }
 
         print_mat_normal(mat, size[0], size[0]);/*the mat is square matrix*/
+
+        if (strcmp(goal, "jacobi") == 0) {/*jacobi is (Nx1)xN*/
+            for (j = 0; j < size[0]-1; j++){
+                printf("%.4f, ", mat[size[0]][j]);
+            }
+            printf("%.4f\n", mat[size[0]][size[0]-1]);
+        }
         
     }/*end of if*/
     else{

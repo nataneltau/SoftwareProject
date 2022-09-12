@@ -84,6 +84,9 @@ def heuristic(file_name):
     mat = make_double_mat(file_name)
     return kpp.heuristic_capi(mat, row, col)
 
+def vectors_matrix_capi(mat, k):
+    return kpp.vectors_matrix_capi(mat, len(mat), k)
+
 
 def kmeans_plus_plus(k, max_iter, eps, mat):
     
@@ -111,7 +114,7 @@ def kmeans_plus_plus(k, max_iter, eps, mat):
 
     print(centroids_indices)
 
-    kpp_res = kpp.kmeans_double_capi(k, max_iter, eps, "my_nice_output.txt")   # result will be written to output
+    kpp_res = kpp.kmeans_double_capi(k, max_iter, eps, mat, N, cor_num, centroids_indices)   # result will be written to output
 
     if kpp_res != 0:
         print("An Error Has Occurred")
@@ -135,16 +138,16 @@ if __name__ == '__main__':
     #need to check print(np.array(wam_func("firsti.txt")))
 
 
-"""
+
     try:
-        if len(args) != 3:#invalid
+        if len(args) != 4:#invalid
             print("Invalid Input!\n")
         else:
             if(int(args[1]) == 0):#this cause the error cause there is nothing to the if block
     except:
         pass
 
-
+"""
     try:
         fr = open("tmpFile.txt", "r")
     except OSError:

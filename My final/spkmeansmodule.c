@@ -258,24 +258,41 @@ static PyObject* heuristic_capi(PyObject *self, PyObject *args){
 static PyObject* kmeans_double_capi(PyObject *self, PyObject *args)
 {
     double eps;
-    int k, max_iter;
+    int k, max_iter = 300;
     double **mat;
     double **index_mat;
     int row, col;
     PyObject *float_mat, *ind_matrix;
 
-    if (!PyArg_ParseTuple(args, "iidOii", &k, &max_iter, &eps, &float_mat, &row, &col)){
+    if (!PyArg_ParseTuple(args, "iidOiiO", &k, &max_iter, &eps, &float_mat, &row, &col, &ind_matrix)){
         return NULL;
     }
+
+
 
     mat = python_mat_to_C_mat(float_mat);
     index_mat = python_mat_to_C_mat(ind_matrix);
 
 
 /* This builds the answer ("d" = Convert a C double to a Python floating point number) back into a python object */
-    return Py_BuildValue("i", kmeans_double(k, max_iter, eps, mat, row, col)); /*  Py_BuildValue(...) returns a PyObject*  */
+    return Py_BuildValue("i", kmeans_double(k, max_iter, eps, mat, row, col, index_mat)); /*  Py_BuildValue(...) returns a PyObject*  */
     
 }/*end of kmeans_double_capi function*/
+
+static PyObject* vectors_matrix_capi(PyObject *self, PyObject *args)
+{
+    double **mat;
+    int size, k;/*Square matrix*/
+    PyObject *float_mat;
+
+    if (!PyArg_ParseTuple(args, "Oi", &float_mat, &size, &k)){
+        return NULL;
+    }
+
+    mat = python_mat_to_C_mat(float_mat);
+
+    return C_mat_to_python_mat(vectors_matrix(mat, size, k), size, k);
+}/*end of vectors_matrix_capi function*/
 
 
 /*static PyObject* wam_capi(PyObject *self, PyObject *args)
@@ -379,6 +396,11 @@ static PyMethodDef capiMethods[] = {
 
     {"kmeans_double_capi",                   /* the Python method name that will be used */
       (PyCFunction) kmeans_double_capi, /* the C-function that implements the Python function and returns static PyObject*  */
+      METH_VARARGS,           /* flags indicating parametersaccepted for this function */
+      PyDoc_STR("A geometric series up to n. sum_up_to_n(z^n)")}, /*  The docstring for the function *///NEED TO CHANGE DESCRIPTION
+
+    {"vectors_matrix_capi",                   /* the Python method name that will be used */
+      (PyCFunction) vectors_matrix_capi, /* the C-function that implements the Python function and returns static PyObject*  */
       METH_VARARGS,           /* flags indicating parametersaccepted for this function */
       PyDoc_STR("A geometric series up to n. sum_up_to_n(z^n)")}, /*  The docstring for the function *///NEED TO CHANGE DESCRIPTION
 
