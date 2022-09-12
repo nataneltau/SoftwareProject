@@ -11,12 +11,12 @@ double** ddg_func(double **mat, int N, int dim);
 
 double** lnorm_func(double **mat, int N, int dim);
 
-/*these 3 I need to add to the module*/
 double **jacobi_func(double **A, int N);
 
 int heuristic(double **mat, int N, int dim);
 
-double** kmeans_double(int k, int max_iter, int eps, double** mat, int row, int dimension);
+/*these I need to add to the module*/
+int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int dimension);
 
 #endif
 

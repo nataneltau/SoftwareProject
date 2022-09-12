@@ -1,4 +1,4 @@
-#import numpy as np
+import numpy as np
 #import pandas as pd
 import sys
 import os
@@ -17,7 +17,7 @@ class goal(enum.Enum):
 def get_mat_size(input_file):
 
     try:
-        fr = open(input_file, "r")
+        fr = open(input_file, 'r')
     except OSError:
         print("Invalid Input!\n")
         return  
@@ -25,6 +25,7 @@ def get_mat_size(input_file):
     try:
         inp_txt = fr.read()
         data_points = inp_txt.split("\n")
+        data_points = list(filter(None, data_points))#remove empty lines
         data_num = len(data_points)
         tmp = data_points[0].split(",")
         dimension = len(tmp)
@@ -59,21 +60,33 @@ def lnorm_func(file_name):
     mat = make_double_mat(file_name)
     return kpp.lnorm_capi(mat, row, col)
 
-#/*these 3 I need to add to the module need also add their functions*/
-
-
 def jacobi_func(file_name):
-    pass
+    row, col = get_mat_size(file_name)
+    mat = make_double_mat(file_name)
+    return kpp.jacobi_capi(mat, row)
 
+def heuristic(file_name):
+    row, col = get_mat_size(file_name)
+    mat = make_double_mat(file_name)
+    return kpp.heuristic_capi(mat, row, col)
 
-def cal_matrix(k, goal, file_name):
-    pass
-
+#
+#
+#kmeans++ remaining
+#
+#
 
 if __name__ == '__main__':
 
     args = sys.argv  # args[0] = k, args[1] = goal, args[2] = file_name
 
+    row, col = get_mat_size("tmpFile.txt")
+
+
+    #need to check print(np.array(wam_func("firsti.txt")))
+
+
+"""
     try:
         if len(args) != 3:#invalid
             print("Invalid Input!\n")
@@ -110,10 +123,7 @@ if __name__ == '__main__':
     print(a)
 
     
-        
-
-    """
-
+ 
     try:
         if len(args) == 3:
             if args[2] == goal.spk:

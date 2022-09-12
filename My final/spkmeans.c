@@ -18,7 +18,7 @@ enum goal{wam, ddg, lnorm, jacobi};
 
 
 const int DEFAULT_ITER = 200;
-int epsi;
+double epsi;
 
 
 /*maybe add a func that will count the numbers of lines(point) in the file
@@ -143,7 +143,7 @@ void update_centroids(double clus_len, double **cluster, int dimension, double *
 }/*end of function update_centroids*/
 
 /*tested on input, worked right*/
-double** kmeans_double(int k, int max_iter, int eps, double** mat, int row, int dimension){/*should write the k wanted centroid at the start of the file*/
+int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int dimension){/*should write the k wanted centroid at the start of the file*/
 
     int iter_num = 0;
     double *buff;
@@ -375,7 +375,7 @@ double** kmeans_double(int k, int max_iter, int eps, double** mat, int row, int 
     free(str_centroid_buffer);
     free(the_index_of_cent);
 
-    return arr_centroids;/*the run complete succesfuly*/
+    return 1;/*the run complete succesfuly*/
 
 }/*end of kmeans_double function*/
 
