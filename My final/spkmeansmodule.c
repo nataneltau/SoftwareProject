@@ -260,14 +260,17 @@ static PyObject* kmeans_double_capi(PyObject *self, PyObject *args)
     double eps;
     int k, max_iter;
     double **mat;
+    double **index_mat;
     int row, col;
-    PyObject *float_mat;
+    PyObject *float_mat, *ind_matrix;
 
     if (!PyArg_ParseTuple(args, "iidOii", &k, &max_iter, &eps, &float_mat, &row, &col)){
         return NULL;
     }
 
     mat = python_mat_to_C_mat(float_mat);
+    index_mat = python_mat_to_C_mat(ind_matrix);
+
 
 /* This builds the answer ("d" = Convert a C double to a Python floating point number) back into a python object */
     return Py_BuildValue("i", kmeans_double(k, max_iter, eps, mat, row, col)); /*  Py_BuildValue(...) returns a PyObject*  */

@@ -1,5 +1,5 @@
 import numpy as np
-#import pandas as pd
+import pandas as pd
 import sys
 import os
 import mykmeanssp as kpp
@@ -13,6 +13,16 @@ class goal(enum.Enum):
     lnorm = 4
     jacobi = 5
 
+
+def calc_DL(row, centroids, cor_num):
+    min_diff = sys.maxsize
+    for centroid in centroids:
+        diff = 0
+        for j in range(cor_num):
+            diff += ((row[j] - centroid['x_' + str(j)]) ** 2)
+        if diff < min_diff:
+            min_diff = diff
+    return min_diff
 
 def print_matrix(matrix):
     for element in matrix:
@@ -73,6 +83,39 @@ def heuristic(file_name):
     row, col = get_mat_size(file_name)
     mat = make_double_mat(file_name)
     return kpp.heuristic_capi(mat, row, col)
+
+
+def kmeans_plus_plus(k, max_iter, eps, mat):
+    
+    N = len(mat)
+    cor_num = len(mat[0])
+    lst_centroids = []
+    centroids_indices = []
+    nodes = pd.DataFrame(mat)
+    np.random.seed(0)
+    indexes = [i for i in range(N - 1)]
+    index = np.random.choice(indexes)
+    centroid = nodes.loc[index]
+    lst_centroids.append(centroid)
+    centroids_indices.append(index)
+
+    for i in range(1, k):
+        nodes['D'] = nodes.apply(lambda row: calc_DL(row, lst_centroids, cor_num), axis=1)
+        sum_D = nodes['D'].sum()
+
+        nodes['P'] = nodes['D'].apply(lambda dl: dl / sum_D)
+
+        key = np.random.choice(nodes.index.values, p=nodes['P'])
+        lst_centroids.append(nodes.loc[key])
+        centroids_indices.append(key)
+
+    print(centroids_indices)
+
+    kpp_res = kpp.kmeans_double_capi(k, max_iter, eps, "my_nice_output.txt")   # result will be written to output
+
+    if kpp_res != 0:
+        print("An Error Has Occurred")
+        sys.exit()
 
 #
 #

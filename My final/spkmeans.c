@@ -143,7 +143,7 @@ void update_centroids(double clus_len, double **cluster, int dimension, double *
 }/*end of function update_centroids*/
 
 /*tested on input, worked right*/
-int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int dimension){/*should write the k wanted centroid at the start of the file*/
+int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int dimension, double **first_index){/*should write the k wanted centroid at the start of the file*/
 
     int iter_num = 0;
     double *buff;
@@ -264,7 +264,7 @@ int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int di
 
     for(i=0; i<k; i++){
 
-        memcpy(arr_centroids[i], mat[i], dimension * sizeof(double));
+        memcpy(arr_centroids[i], mat[(int)first_index[0][i]], dimension * sizeof(double));
     }
 
 
@@ -1111,6 +1111,18 @@ double **jacobi_func(double **A, int N){/*tested on input, works right*/
     free_mat(V, N);
 
     return res;
+
+}
+
+double **vectors_matrix(double **mat, int N, int k){
+
+    double calc_dist_double(const double *x, double *centroid, int dimension);/*this function calculate (x-centroid)^2*/
+
+    double **vec_mat;
+
+    vec_mat = (double **)calloc(N, sizeof(double *));
+
+    /*k iterations on mat , any iter find max, put him as col then make him zero, do it until k*/
 
 }
 
