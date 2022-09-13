@@ -2,8 +2,9 @@ import numpy as np
 import pandas as pd
 import sys
 import os
-import mykmeanssp as kpp
 import enum
+import mykmeanssp as kpp
+
 
 
 class goal(enum.Enum):

@@ -1,8 +1,7 @@
-#include "spkmeans.h"
 #define PY_SSIZE_T_CLEAN  /* For all # variants of unit formats (s#, y#, etc.) use Py_ssize_t rather than int. */
 #include <Python.h>       /* MUST include <Python.h>, this implies inclusion of the following standard headers:
                            <stdio.h>, <string.h>, <errno.h>, <limits.h>, <assert.h> and <stdlib.h> (if available). */
-
+#include "spkmeans.h"
 
 /*============================================================================
 ==============================================================================
@@ -10,7 +9,7 @@
 ============================ - END UP HERE - =================================
 ==============================================================================*/
 
-static PyObject* GetMat(double **mat, int *size){
+/*static PyObject* GetMat(double **mat, int *size){
     int m,n, i, j;
     PyObject* python_mat;
     m = size[0];
@@ -27,9 +26,9 @@ static PyObject* GetMat(double **mat, int *size){
         PyList_SetItem(python_mat, i, python_row);
     }
     return python_mat;
-}
+}*/
 
-double **c_mat(PyObject *float_mat){
+/*double **c_mat(PyObject *float_mat){
     PyObject *row, *item;
     double **mat;
     int rows, columns,i ,j;
@@ -58,7 +57,7 @@ double **c_mat(PyObject *float_mat){
 
     return mat;
 
-}
+}*/
 
 
 /*converting a python matrix to a C matrix*/
@@ -101,7 +100,7 @@ static double **python_mat_to_C_mat(PyObject *py_mat){
         list = PyList_GetItem(py_mat, i);
         for(j=0; j<n_cols; j++){
             mat[i][j] = PyFloat_AsDouble(PyList_GetItem(list,j));
-            if(mat[i][j] == -1.0 && PyErr_Occurred){
+            if(mat[i][j] == -1.0 && PyErr_Occurred()){
                 printf("An Error Has Occurred\n");
                 return NULL;
             }
@@ -349,7 +348,7 @@ static PyObject* vectors_matrix_capi(PyObject *self, PyObject *args)
     res_size[0] = size[0];
     res_size[1] = size[0];
 
-/* This builds the answer ("d" = Convert a C double to a Python floating point number) back into a python object */
+ This builds the answer ("d" = Convert a C double to a Python floating point number) back into a python object */
     /*return Py_BuildValue("d", test_ctopy(d));*/ /*  Py_BuildValue(...) returns a PyObject*  */
 
    /* return GetMat(lnorm_func(mat, size[0], size[1]), res_size);
