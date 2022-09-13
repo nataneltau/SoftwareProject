@@ -700,7 +700,7 @@ double **get_mat(char *file_name, int rows, int columns){
 
 }
 
-void free_mat(double **mat, int m){
+void free_mat(double **mat, int m){/*m is number of lines, works for any 2d array*/
     int row;
     for (row = 0; row < m; row++){
         free(mat[row]);
@@ -1152,8 +1152,6 @@ int calc_largest_vec(double **mat, int N){
 /*this function get jacobi matrix*/
 double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1*/
 
-    double calc_dist_double(const double *x, double *centroid, int dimension);/*this function calculate (x-centroid)^2*/
-
     double **vec_mat;
     int i, j;
     int index, tmp, sum;
@@ -1235,10 +1233,11 @@ int heuristic(double **mat, int N, int dim){
     int k;
 
     lnorm_mat = lnorm_func(mat, N, dim);
-    printf("finished lnorm_func in heuristic\n");
+    /*printf("finished lnorm_func in heuristic\n");*/
     jacobi_mat = jacobi_func(lnorm_mat, N);
-    printf("finished jacobi_func in heuristic\n");
+    /*printf("finished jacobi_func in heuristic\n");*/
     k = find_k(jacobi_mat, N);
+    /*printf("k is: %d\n", k);*/
     return k;
 }
 

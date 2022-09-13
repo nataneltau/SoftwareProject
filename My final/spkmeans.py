@@ -25,9 +25,8 @@ def calc_DL(row, centroids, cor_num):
             min_diff = diff
     return min_diff
 
-def print_matrix(matrix):
-    for element in matrix:
-        print(element)
+def print_matrix(matrix, col):
+    kpp.print_mat_normal_capi(matrix, len(matrix), col)
 
 def get_mat_size(input_file):
 
@@ -162,30 +161,30 @@ if __name__ == '__main__':
                 kmeans_plus_plus(k, 300, 0.01, vec_mat)
 
             elif goali == "wam":
-                print("row and col\n")
-                row, col = get_mat_size(file_name)
-                print("row is: ", row, "col is: ", col)
-                print("\n")
-                print("normal mat")
-                mati = make_double_mat(file_name)
-                print_matrix(mati)
-                print("\n")
+                #print("row and col\n")
+                #row, col = get_mat_size(file_name)
+                #print("row is: ", row, "col is: ", col)
+                #print("\n")
+                #print("normal mat")
+                #mati = make_double_mat(file_name)
+                #print_matrix(mati)
+                #print("\n")
                 mat = wam_func(file_name)
-                print_matrix(mat)
+                print_matrix(mat, len(mat))
 
             elif goali == "ddg":
                 mat = ddg_func(file_name)
-                print_matrix(mat)
+                print_matrix(mat, len(mat))
             
             elif goali == "lnorm":
                 mat = lnorm_func(file_name)
-                print_matrix(mat)
+                print_matrix(mat, len(mat))
 
             elif goali == "jacobi":
                 row, col = get_mat_size(file_name)
                 mat = make_double_mat(file_name)
                 mat_jacobi = jacobi_func(mat, row)
-                print_matrix(mat_jacobi)
+                print_matrix(mat_jacobi, len(mat_jacobi))
 
             else: 
                 print("Invalid Input!\n")

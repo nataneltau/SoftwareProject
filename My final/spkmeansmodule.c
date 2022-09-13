@@ -159,6 +159,34 @@ int *mat_sizei(PyObject *float_mat){
  * This is a requirement for all functions and methods in the C API.
  * It has input PyObject *args from Python.
  */
+
+void print_mat_normal_capi(PyObject *self, PyObject *args){
+    PyObject *float_mat;
+    double **mat;
+    int row, col;
+
+    if (!PyArg_ParseTuple(args, "Oii", &float_mat, &row, &col)){
+        return NULL;
+    }
+
+    mat = python_mat_to_C_mat(float_mat);
+
+    print_mat_normal(mat, row, col);
+
+}
+
+void fix_mat_points(double **mat, int size){
+    int i, j;
+
+
+    for(i=0; i<size; i++){
+        for(j=0; j<size; j++){
+            mat[i][j] = floor(100000*mat[i][j])/100000;
+        }
+    }
+
+}/*end of fix_mat_points function*/
+
 static PyObject* file_to_mat_capi(PyObject *self, PyObject *args){
 
     char *file_name;
@@ -186,15 +214,22 @@ static PyObject* wam_capi(PyObject *self, PyObject *args){
     }
 
     mat = python_mat_to_C_mat(float_mat);
-
-    print_mat_normal(mat, row, col);
+    /*printf("one\n");
+    print_mat_normal(mat, row, col);*/
 
     size[0]= row;
-    size[1] = col;
+    size[1] = row;
 
     mat = wam_func(mat, row, col);
 
+    /*printf("two\n");
     print_mat_normal(mat, row, row);
+
+    
+    printf("three\n");*/
+    fix_mat_points(mat, row);
+
+    /*printf("\n");*/
 
     return GetMat(mat, size);
 
@@ -231,7 +266,11 @@ static PyObject* ddg_capi(PyObject *self, PyObject *args)
 
     mat = python_mat_to_C_mat(float_mat);
 
-    return C_mat_to_python_mat(ddg_func(mat, row, col), row, col);
+    mat = ddg_func(mat, row, col);
+
+    fix_mat_points(mat, row);
+
+    return GetMat(mat, row, col);
 }/*end of ddg_capi function*/
 
 static PyObject* lnorm_capi(PyObject *self, PyObject *args)
@@ -246,7 +285,11 @@ static PyObject* lnorm_capi(PyObject *self, PyObject *args)
 
     mat = python_mat_to_C_mat(float_mat);
 
-    return C_mat_to_python_mat(lnorm_func(mat, row, col), row, col);
+    mat = lnorm_func(mat, row, col);
+
+    fix_mat_points(mat, row);
+
+    return GetMat(mat, row, col);
 }/*end of lnorm_capi function*/
 
 static PyObject* jacobi_capi(PyObject *self, PyObject *args)
@@ -261,7 +304,12 @@ static PyObject* jacobi_capi(PyObject *self, PyObject *args)
 
     mat = python_mat_to_C_mat(float_mat);
 
-    return C_mat_to_python_mat(jacobi_func(mat, size), size, size);
+    mat = jacobi_func(mat, size);
+
+    fix_mat_points(mat, size);
+
+
+    return GetMat(mat, size, size);
 }/*end of jacobi_capi function*/
 
 static PyObject* heuristic_capi(PyObject *self, PyObject *args){
@@ -391,6 +439,11 @@ static PyObject* vectors_matrix_capi(PyObject *self, PyObject *args)
  * We will use it in the next structure
  */
 static PyMethodDef capiMethods[] = {
+    {"print_mat_normal_capi",                   /* the Python method name that will be used */
+      (PyCFunction) print_mat_normal_capi, /* the C-function that implements the Python function and returns static PyObject*  */
+      METH_VARARGS,           /* flags indicating parametersaccepted for this function */
+      PyDoc_STR("A geometric series up to n. sum_up_to_n(z^n)")}, /*  The docstring for the function *///NEED TO CHANGE DESCRIPTION
+
     {"file_to_mat_capi",                   /* the Python method name that will be used */
       (PyCFunction) file_to_mat_capi, /* the C-function that implements the Python function and returns static PyObject*  */
       METH_VARARGS,           /* flags indicating parametersaccepted for this function */
