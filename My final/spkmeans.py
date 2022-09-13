@@ -40,7 +40,10 @@ def get_mat_size(input_file):
     try:
         inp_txt = fr.read()
         data_points = inp_txt.split("\n")
-        data_points = list(filter(None, data_points))#remove empty lines
+        #data_points = list(filter(lambda x: x == None, data_points))
+        # #remove empty lines
+        while("" in data_points):
+            data_points.remove("")
         data_num = len(data_points)
         tmp = data_points[0].split(",")
         dimension = len(tmp)
@@ -54,6 +57,7 @@ def get_mat_size(input_file):
         return
         
     fr.close()
+    
     return data_num, dimension #data_num is the number of rows, dimension is the number of colmnus
 
 def make_double_mat(file_name):
