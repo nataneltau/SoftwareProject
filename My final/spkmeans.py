@@ -74,17 +74,15 @@ def lnorm_func(file_name):
     mat = make_double_mat(file_name)
     return kpp.lnorm_capi(mat, row, col)
 
-def jacobi_func(file_name):
-    row, col = get_mat_size(file_name)
-    mat = make_double_mat(file_name)
-    return kpp.jacobi_capi(mat, row)
+def jacobi_func(mat, size):
+    return kpp.jacobi_capi(mat, size)
 
 def heuristic(file_name):
     row, col = get_mat_size(file_name)
     mat = make_double_mat(file_name)
     return kpp.heuristic_capi(mat, row, col)
 
-def vectors_matrix_capi(mat, k):
+def vectors_matrix_func(mat, k):
     return kpp.vectors_matrix_capi(mat, len(mat), k)
 
 
@@ -143,7 +141,41 @@ if __name__ == '__main__':
         if len(args) != 4:#invalid
             print("Invalid Input!\n")
         else:
-            if(int(args[1]) == 0):#this cause the error cause there is nothing to the if block
+            file_name = args[3]
+            goali = args[2]
+
+            if goali == "spk":
+                k = int(args[1])
+
+                if k == 0:
+                    k = heuristic(file_name)
+                
+                lnorm_mat = lnorm_func(file_name)
+                jacobi_mat = jacobi_func(lnorm_mat, len(lnorm_mat))
+                vec_mat = vectors_matrix_func(jacobi_mat, k)
+                kmeans_plus_plus(k, 300, 0.01, vec_mat)
+
+            elif goali == "wam":
+                mat = wam_func(file_name)
+                print_matrix(mat)
+
+            elif goali == "ddg":
+                mat = ddg_func(file_name)
+                print_matrix(mat)
+            
+            elif goali == "lnorm":
+                mat = lnorm_func(file_name)
+                print_matrix(mat)
+
+            elif goali == "jacobi":
+                row, col = get_mat_size(file_name)
+                mat = make_double_mat(file_name)
+                mat_jacobi = jacobi_func(mat, row)
+                print_matrix(mat_jacobi)
+
+            else: 
+                print("Invalid Input!\n")
+
     except:
         pass
 
