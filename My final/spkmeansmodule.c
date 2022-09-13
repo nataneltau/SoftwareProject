@@ -179,17 +179,17 @@ static PyObject* print_mat_normal_capi(PyObject *self, PyObject *args){
 
 }
 
-void fix_mat_points(double **mat, int size){
+/*void fix_mat_points(double **mat, int size){
     int i, j;
 
 
     for(i=0; i<size; i++){
         for(j=0; j<size; j++){
-            mat[i][j] = floor(100000*mat[i][j])/100000;
+            mat[i][j] = floor(10000000*mat[i][j])/10000000;
         }
     }
 
-}/*end of fix_mat_points function*/
+}end of fix_mat_points function*/
 
 static PyObject* file_to_mat_capi(PyObject *self, PyObject *args){
 
@@ -201,6 +201,8 @@ static PyObject* file_to_mat_capi(PyObject *self, PyObject *args){
     }
 
     mat_s = mat_size(file_name);
+
+    print_mat_normal(file_to_mat(file_name), mat_s[0], mat_s[1]);
 
     return C_mat_to_python_mat(file_to_mat(file_name), mat_s[0], mat_s[1]);
 
@@ -231,7 +233,7 @@ static PyObject* wam_capi(PyObject *self, PyObject *args){
 
     
     printf("three\n");*/
-    fix_mat_points(mat, row);
+    /*fix_mat_points(mat, row);*/
 
     /*printf("\n");*/
 
@@ -273,7 +275,7 @@ static PyObject* ddg_capi(PyObject *self, PyObject *args)
 
     mat = ddg_func(mat, row, col);
 
-    fix_mat_points(mat, row);
+    /*fix_mat_points(mat, row);*/
 
     size[0] = row;
     size[1] = row;
@@ -296,7 +298,7 @@ static PyObject* lnorm_capi(PyObject *self, PyObject *args)
 
     mat = lnorm_func(mat, row, col);
 
-    fix_mat_points(mat, row);
+    /*fix_mat_points(mat, row);*/
 
     size[0] = row;
     size[1] = row;
@@ -319,10 +321,15 @@ static PyObject* jacobi_capi(PyObject *self, PyObject *args)
 
     mat = jacobi_func(mat, size);
 
-    fix_mat_points(mat, size);
+    /*fix_mat_points(mat, size);*/
 
-    size_arr[0] = size;
+
+
+    size_arr[0] = size+1;
     size_arr[1] = size;
+    printf("\nmat\n");
+    print_mat_normal(mat, size+1, size);
+    printf("\nmat\n");
 
 
     return GetMat(mat, size_arr);
