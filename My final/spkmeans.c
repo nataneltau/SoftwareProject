@@ -1107,7 +1107,11 @@ double **jacobi_func(double **A, int N){/*tested on input, works right*/
     for (i = 0; i < N; i++){
         res[i+1] = V[i];
     }
-    free_mat(V, N);
+
+    /*free_mat(V, N);*/
+
+    /*printf("inside jac\n");
+    print_mat_normal(res, N+1, N);*/
 
     return res;
 

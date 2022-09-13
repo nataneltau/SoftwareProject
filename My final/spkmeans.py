@@ -28,7 +28,10 @@ def calc_DL(row, centroids, cor_num):
 def print_matrix(matrix, col):
     #kpp.print_mat_normal_capi(matrix, len(matrix), col)
     #print("finish mat print")
-    for element in mat:
+    #print("start the printing")
+
+    #print(len(matrix))
+    for element in matrix:
         el = element
         for item in range(0, len(el)-1):
             print("%.4f" %el[item], end = ',')
@@ -188,20 +191,21 @@ if __name__ == '__main__':
                 print_matrix(mat, len(mat))
 
             elif goali == "jacobi":
-                print("enter jacobi")
+                #print("enter jacobi")
                 #print("row and col\n")
                 row, col = get_mat_size(file_name)
                 #print("row is: ", row, "col is: ", col)
                 #print("\n")
                 #print("normal mat")
-                print("convert mat")
+                #print("convert mat")
                 mati = make_double_mat(file_name)
-                print("finish conv")
+                #print("finish conv")
                 #print(len(mati))
                 #row, col = get_mat_size(file_name)
                 #mati = make_double_mat(file_name)
-                print("start calc")
+                #print("start calc")
                 mat_jacobi = jacobi_func(mati, row)
+                #print("finish calc")
                 print_matrix(mat_jacobi, len(mat_jacobi))
 
             else: 

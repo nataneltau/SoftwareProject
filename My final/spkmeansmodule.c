@@ -202,7 +202,7 @@ static PyObject* file_to_mat_capi(PyObject *self, PyObject *args){
 
     mat_s = mat_size(file_name);
 
-    print_mat_normal(file_to_mat(file_name), mat_s[0], mat_s[1]);
+    /*print_mat_normal(file_to_mat(file_name), mat_s[0], mat_s[1]);*/
 
     return C_mat_to_python_mat(file_to_mat(file_name), mat_s[0], mat_s[1]);
 
@@ -308,7 +308,7 @@ static PyObject* lnorm_capi(PyObject *self, PyObject *args)
 
 static PyObject* jacobi_capi(PyObject *self, PyObject *args)
 {
-    double **mat;
+    double **mat, **jac_mat;
     int size;/*Square matrix*/
     int size_arr[2];
     PyObject *float_mat;
@@ -319,7 +319,11 @@ static PyObject* jacobi_capi(PyObject *self, PyObject *args)
 
     mat = python_mat_to_C_mat(float_mat);
 
-    mat = jacobi_func(mat, size);
+    /*printf("\nmat before\n");
+    print_mat_normal(mat, size, size);
+    printf("\nmat before\n");*/
+
+    jac_mat = jacobi_func(mat, size);
 
     /*fix_mat_points(mat, size);*/
 
@@ -327,12 +331,12 @@ static PyObject* jacobi_capi(PyObject *self, PyObject *args)
 
     size_arr[0] = size+1;
     size_arr[1] = size;
-    printf("\nmat\n");
-    print_mat_normal(mat, size+1, size);
-    printf("\nmat\n");
+    /*printf("\nmat\n");
+    print_mat_normal(jac_mat, size+1, size);
+    printf("\nmat\n");*/
 
 
-    return GetMat(mat, size_arr);
+    return GetMat(jac_mat, size_arr);
 }/*end of jacobi_capi function*/
 
 static PyObject* heuristic_capi(PyObject *self, PyObject *args){
