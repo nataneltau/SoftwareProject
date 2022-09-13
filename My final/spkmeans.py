@@ -114,16 +114,26 @@ def kmeans_plus_plus(k, max_iter, eps, mat):
     lst_centroids.append(centroid)
     centroids_indices.append(index)
 
+    print("we inside kmeas++ in py, row is", N, "col is", cor_num)
+    print(nodes)
+
     for i in range(1, k):
         nodes['D'] = nodes.apply(lambda row: calc_DL(row, lst_centroids, cor_num), axis=1)
         sum_D = nodes['D'].sum()
 
+        print("1")
+
         nodes['P'] = nodes['D'].apply(lambda dl: dl / sum_D)
+
+        print("2")
 
         key = np.random.choice(nodes.index.values, p=nodes['P'])
         lst_centroids.append(nodes.loc[key])
         centroids_indices.append(key)
 
+        print("3")
+
+    print("we are about to print random choice")
     print(centroids_indices)
 
     kpp_res = kpp.kmeans_double_capi(k, max_iter, eps, mat, N, cor_num, centroids_indices)   # result will be written to output
@@ -163,10 +173,16 @@ if __name__ == '__main__':
 
                 if k == 0:
                     k = heuristic(file_name)
+
+                print(" we pass k in spk")
                 
                 lnorm_mat = lnorm_func(file_name)
                 jacobi_mat = jacobi_func(lnorm_mat, len(lnorm_mat))
+                print("we start kmeans")
                 vec_mat = vectors_matrix_func(jacobi_mat, k)
+                print("we calc vec")
+                print_matrix(vec_mat, k)
+                print()
                 kmeans_plus_plus(k, 300, 0.01, vec_mat)
 
             elif goali == "wam":

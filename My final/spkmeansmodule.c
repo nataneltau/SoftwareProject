@@ -387,13 +387,19 @@ static PyObject* vectors_matrix_capi(PyObject *self, PyObject *args)
     int size, k;/*Square matrix*/
     PyObject *float_mat;
 
-    if (!PyArg_ParseTuple(args, "Oi", &float_mat, &size, &k)){
+    if (!PyArg_ParseTuple(args, "Oii", &float_mat, &size, &k)){
         return NULL;
     }
 
+    printf("size is: %d, k is: %d\n", size, k);
+
     mat = python_mat_to_C_mat(float_mat);
 
-    return C_mat_to_python_mat(vectors_matrix(mat, size, k), size, k);
+    printf("\nmat\n");
+    print_mat_normal(mat, size, size-1);
+    printf("\nmat\n");
+
+    return C_mat_to_python_mat(vectors_matrix(mat, size, k), size-1, k);
 }/*end of vectors_matrix_capi function*/
 
 

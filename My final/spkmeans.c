@@ -533,11 +533,11 @@ int find_k(double **mat, int N){
     int res, i;
     eigenvalues = mat[0];
     qsort(eigenvalues, N, sizeof(double), compare);
-    printf("eigenvalues: \n");
+    /*printf("eigenvalues: \n");
     for (i = 0; i < N; i++){
         printf("%f, ", eigenvalues[i]);
     }
-    printf("\n");
+    printf("\n");*/
 
 
 
@@ -1158,7 +1158,8 @@ double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1
 
     double **vec_mat;
     int i, j;
-    int index, tmp, sum;
+    double tmp, sum;
+    int index;
 
     vec_mat = (double **)calloc(N, sizeof(double *));
 
@@ -1179,26 +1180,31 @@ double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1
     for(i = 0; i<k; i++){
 
         /*choose the first eigenvectors*/
-        /*tmp = mat[0][0];
+        tmp = mat[0][0];
         index = 0;
 
         for(j=1; j<N; j++){
+            if(mat[0][j] > tmp){
+                tmp = mat[0][j];
+                index = j;
+            }
+        }
 
-        }*/
-
-        index = calc_largest_vec(mat, N);
-
-        for(j=0; j<N; j++){
-
-            vec_mat[j][i] = mat[index+1][j]; /*letting the largest vector as column*/
-
-        }/*end of inner for*/
+        /*index = calc_largest_vec(mat, N);*/
 
         for(j=0; j<N; j++){
 
-            mat[index+1][j] = 0; /*make the largest full of zeroes*/
+            vec_mat[j][i] = mat[index+1][j]; /*letting the largest vector as column j*/
 
         }/*end of inner for*/
+
+        /*for(j=0; j<N; j++){
+
+            mat[index+1][j] = 0; make the largest full of zeroes
+
+        }end of inner for*/
+
+        mat[0][index] = 0;
 
     }/*end of outer for*/
 
@@ -1218,6 +1224,10 @@ double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1
         }/*end of inner for*/
 
         sum = sqrt(sum);
+
+        if(sum == 0){
+            continue;
+        }
 
         for(j=0; j<k; j++){
 
