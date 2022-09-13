@@ -1,6 +1,8 @@
 #ifndef SPKMEANS_H
 #define SPKMEANS_H
 
+void print_mat_normal(double **mat, int row, int col);
+
 int *mat_size(char *file_name);
 
 double ** file_to_mat(char* filename);

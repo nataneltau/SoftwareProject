@@ -67,8 +67,8 @@ def make_double_mat(file_name):
 def wam_func(file_name):
     row, col = get_mat_size(file_name)
     mat = make_double_mat(file_name)
-    #return kpp.wam_capi(mat, row, col)
-    return kpp.wam_capionn(file_name)
+    return kpp.wam_capi(mat, row, col)
+    #return kpp.wam_capionn(file_name)
 
 def ddg_func(file_name):
     row, col = get_mat_size(file_name)
@@ -143,7 +143,7 @@ if __name__ == '__main__':
 
 
 
-    try:
+    try:#maybe accept also args == 3 , without k
         if len(args) != 4:#invalid
             print("Invalid Input!\n")
         else:
@@ -162,6 +162,14 @@ if __name__ == '__main__':
                 kmeans_plus_plus(k, 300, 0.01, vec_mat)
 
             elif goali == "wam":
+                print("row and col\n")
+                row, col = get_mat_size(file_name)
+                print("row is: ", row, "col is: ", col)
+                print("\n")
+                print("normal mat")
+                mati = make_double_mat(file_name)
+                print_matrix(mati)
+                print("\n")
                 mat = wam_func(file_name)
                 print_matrix(mat)
 

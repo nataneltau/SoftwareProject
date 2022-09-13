@@ -9,7 +9,7 @@
 ============================ - END UP HERE - =================================
 ==============================================================================*/
 
-/*static PyObject* GetMat(double **mat, int *size){
+static PyObject* GetMat(double **mat, int *size){
     int m,n, i, j;
     PyObject* python_mat;
     m = size[0];
@@ -26,9 +26,9 @@
         PyList_SetItem(python_mat, i, python_row);
     }
     return python_mat;
-}*/
+}
 
-/*double **c_mat(PyObject *float_mat){
+double **c_mat(PyObject *float_mat){
     PyObject *row, *item;
     double **mat;
     int rows, columns,i ,j;
@@ -57,7 +57,7 @@
 
     return mat;
 
-}*/
+}
 
 
 /*converting a python matrix to a C matrix*/
@@ -178,6 +178,7 @@ static PyObject* file_to_mat_capi(PyObject *self, PyObject *args){
 static PyObject* wam_capi(PyObject *self, PyObject *args){
     PyObject *float_mat;
     double **mat;
+    int size[2];
     int row, col;
 
     if (!PyArg_ParseTuple(args, "Oii", &float_mat, &row, &col)){
@@ -186,7 +187,16 @@ static PyObject* wam_capi(PyObject *self, PyObject *args){
 
     mat = python_mat_to_C_mat(float_mat);
 
-    return C_mat_to_python_mat(wam_func(mat, row, col), row, col);
+    print_mat_normal(mat, row, col);
+
+    size[0]= row;
+    size[1] = col;
+
+    mat = wam_func(mat, row, col);
+
+    print_mat_normal(mat, row, row);
+
+    return GetMat(mat, size);
 
 
 }/*end of wam_capi function*/
@@ -204,7 +214,7 @@ static PyObject* wam_capionn(PyObject *self, PyObject *args){
 
     c_mat = file_to_mat(file_name);
 
-    return C_mat_to_python_mat(wam_func(c_mat, mat_s[0], mat_s[1]), mat_s[0], mat_s[1]);
+    return GetMat(wam_func(c_mat, mat_s[0], mat_s[1]), mat_s);
 
 
 }/*end of wam_capi function*/
