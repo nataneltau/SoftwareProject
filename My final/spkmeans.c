@@ -642,15 +642,14 @@ int *mat_size(char *file_name){
 
     res[0] = rows;
     res[1] = columns;
-    printf("rows: %i\n", rows);
-    printf("columns: %i\n", columns);
+    /*printf("rows: %i\n", rows);
+    printf("columns: %i\n", columns);*/
     return res;
 }
 
 double **get_mat(char *file_name, int rows, int columns){
     double **mat;
     int i, j;
-    int max_chars_in_line;
     double temp;
     char /*line[(columns+1)*sizeof(double)],*/ *token;
     char line[250];
@@ -1243,7 +1242,7 @@ int heuristic(double **mat, int N, int dim){
     return k;
 }
 
-double **spk(double **mat, int N, int dim, int k, int max_iter, int eps){
+/*double **spk(double **mat, int N, int dim, int k, int max_iter, int eps){
     double **res;
     printf("k = %i",k);
 
@@ -1251,7 +1250,7 @@ double **spk(double **mat, int N, int dim, int k, int max_iter, int eps){
     res[0] = calloc(2, sizeof(double));
     res[1] = calloc(2, sizeof(double));
     return res;
-}
+}*/
 
 
 void test_jacoby(){
@@ -1273,7 +1272,7 @@ void test_jacoby(){
 
 double **test_pytoc(double **mat, int N){
     print_mat(mat, N);
-    //free_mat(mat, N);
+    /*free_mat(mat, N);*/
     return mat;
 }
 
@@ -1356,25 +1355,26 @@ void test_lnorm(){
         exit(1);
     }
 
-    while(fscanf(fr, "%s", buff ) == 1){/*count the numbers of lines*/
+    count the numbers of lines
+    while(fscanf(fr, "%s", buff ) == 1){
 
-        /*num_of_lines++;
+        num_of_lines++;
 
-    }/*end of while*/
+    }end of while*/
 
     /*free(buff);
 
     return num_of_lines;
 
-    return -1;*/
-
-/*}/*end of function numbersOfLines*/
+    return -1;
+    
+}*/
+/*end of function numbersOfLines*/
 
 
 /*Tested, works right, read the file and make double matrix from it*/
 double ** file_to_mat(char* filename){
     FILE *fr;
-    int *row_and_col;
     double **res_mat;
     char *buff;
     char **data_points;
@@ -1461,7 +1461,7 @@ void print_mat_normal(double **mat, int row, int col){
     int i, j;
     for (i = 0; i < row; i++){
         for (j = 0; j < col-1; j++){
-            printf("%.4f, ", mat[i][j]);
+            printf("%.4f,", mat[i][j]);
         }
         printf("%.4f\n", mat[i][col-1]);
     }
@@ -1478,9 +1478,8 @@ int main(int argc, char *argv[]){
     int j;
     char* goal; 
     char *file_name;
-    int *size, k;
+    int *size;
     double **mat, **mat_to_print;
-    size = mat_size(file_name);
 
     if(argc == 3){
         
@@ -1507,13 +1506,13 @@ int main(int argc, char *argv[]){
             exit(1);
         }
 
-        print_mat_normal(mat, size[0], size[0]);/*the mat is square matrix*/
+        print_mat_normal(mat_to_print, size[0], size[0]);/*the mat is square matrix*/
 
         if (strcmp(goal, "jacobi") == 0) {/*jacobi is (Nx1)xN*/
             for (j = 0; j < size[0]-1; j++){
-                printf("%.4f, ", mat[size[0]][j]);
+                printf("%.4f,", mat_to_print[size[0]][j]);
             }
-            printf("%.4f\n", mat[size[0]][size[0]-1]);
+            printf("%.4f\n", mat_to_print[size[0]][size[0]-1]);
         }
         
     }/*end of if*/
@@ -1564,26 +1563,26 @@ int main(int argc, char *argv[]){
     /*
 
 
-/*
+
 
     char *file_name;
     int *size, k;
     double **mat, **jacobi_mat, **wam_mat, **ddg_mat, **ddg_sqrt, **lnorm_mat;
     file_name = "tmpFile.txt";
     size = mat_size(file_name);
-    //mat = get_mat(file_name, size[0], size[1]);
+    mat = get_mat(file_name, size[0], size[1]);
     mat = file_to_mat(file_name);
     print_mat_normal(mat, size[0], size[1]);
-    /*kmeans_double(3, 600, 0.1, mat, size[0], size[1]);*/
+    kmeans_double(3, 600, 0.1, mat, size[0], size[1]);*/
 
     /*wam_mat = wam_func(mat, size[0], size[1]);
     ddg_mat = ddg_func(mat, size[0], size[1]);
     ddg_sqrt = calc_mat_sqrt(ddg_mat, size[0]);
     lnorm_mat = lnorm_func(mat, size[0], size[1]);
-    /*k = heuristic(mat, size[0], size[1]);*/
+    k = heuristic(mat, size[0], size[1]);*/
 
-    //printf("k = %d", k);
-    /*test_wam();*/
+    /*printf("k = %d", k);
+    test_wam();*/
 
     /*jacobi_mat = jacobi_func(mat, size[0]);
     printf("wam_mat: \n");
