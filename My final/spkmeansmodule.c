@@ -160,7 +160,7 @@ int *mat_sizei(PyObject *float_mat){
  * It has input PyObject *args from Python.
  */
 
-void print_mat_normal_capi(PyObject *self, PyObject *args){
+static PyObject* print_mat_normal_capi(PyObject *self, PyObject *args){
     PyObject *float_mat;
     double **mat;
     int row, col;
@@ -170,8 +170,12 @@ void print_mat_normal_capi(PyObject *self, PyObject *args){
     }
 
     mat = python_mat_to_C_mat(float_mat);
-
+    /*printf("row is: %d, col is: %d\n", row, col);*/
     print_mat_normal(mat, row, col);
+
+    /*printf("\nfinish print\n");*/
+
+    return Py_BuildValue("i", row);
 
 }
 
@@ -258,6 +262,7 @@ static PyObject* ddg_capi(PyObject *self, PyObject *args)
 {
     double **mat;
     int row, col;
+    int size[2];
     PyObject *float_mat;
 
     if (!PyArg_ParseTuple(args, "Oii", &float_mat, &row, &col)){
@@ -270,13 +275,17 @@ static PyObject* ddg_capi(PyObject *self, PyObject *args)
 
     fix_mat_points(mat, row);
 
-    return GetMat(mat, row, col);
+    size[0] = row;
+    size[1] = row;
+
+    return GetMat(mat, size);
 }/*end of ddg_capi function*/
 
 static PyObject* lnorm_capi(PyObject *self, PyObject *args)
 {
     double **mat;
     int row, col;
+    int size[2];
     PyObject *float_mat;
 
     if (!PyArg_ParseTuple(args, "Oii", &float_mat, &row, &col)){
@@ -289,13 +298,17 @@ static PyObject* lnorm_capi(PyObject *self, PyObject *args)
 
     fix_mat_points(mat, row);
 
-    return GetMat(mat, row, col);
+    size[0] = row;
+    size[1] = row;
+
+    return GetMat(mat, size);
 }/*end of lnorm_capi function*/
 
 static PyObject* jacobi_capi(PyObject *self, PyObject *args)
 {
     double **mat;
     int size;/*Square matrix*/
+    int size_arr[2];
     PyObject *float_mat;
 
     if (!PyArg_ParseTuple(args, "Oi", &float_mat, &size)){
@@ -308,8 +321,11 @@ static PyObject* jacobi_capi(PyObject *self, PyObject *args)
 
     fix_mat_points(mat, size);
 
+    size_arr[0] = size;
+    size_arr[1] = size;
 
-    return GetMat(mat, size, size);
+
+    return GetMat(mat, size_arr);
 }/*end of jacobi_capi function*/
 
 static PyObject* heuristic_capi(PyObject *self, PyObject *args){

@@ -27,6 +27,7 @@ def calc_DL(row, centroids, cor_num):
 
 def print_matrix(matrix, col):
     kpp.print_mat_normal_capi(matrix, len(matrix), col)
+    #print("finish mat print")
 
 def get_mat_size(input_file):
 
@@ -171,6 +172,7 @@ if __name__ == '__main__':
                 #print("\n")
                 mat = wam_func(file_name)
                 print_matrix(mat, len(mat))
+                #print("hi")
 
             elif goali == "ddg":
                 mat = ddg_func(file_name)
