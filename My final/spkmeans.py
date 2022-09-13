@@ -67,7 +67,8 @@ def make_double_mat(file_name):
 def wam_func(file_name):
     row, col = get_mat_size(file_name)
     mat = make_double_mat(file_name)
-    return kpp.wam_capi(mat, row, col)
+    #return kpp.wam_capi(mat, row, col)
+    return kpp.wam_capionn(file_name)
 
 def ddg_func(file_name):
     row, col = get_mat_size(file_name)

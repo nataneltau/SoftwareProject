@@ -191,6 +191,24 @@ static PyObject* wam_capi(PyObject *self, PyObject *args){
 
 }/*end of wam_capi function*/
 
+static PyObject* wam_capionn(PyObject *self, PyObject *args){
+    char *file_name;
+    int *mat_s;
+    double **c_mat;
+
+    if (!PyArg_ParseTuple(args, "s", &file_name)){
+        return NULL;
+    }
+
+    mat_s = mat_size(file_name);
+
+    c_mat = file_to_mat(file_name);
+
+    return C_mat_to_python_mat(wam_func(c_mat, mat_s[0], mat_s[1]), mat_s[0], mat_s[1]);
+
+
+}/*end of wam_capi function*/
+
 static PyObject* ddg_capi(PyObject *self, PyObject *args)
 {
     double **mat;
@@ -365,6 +383,11 @@ static PyObject* vectors_matrix_capi(PyObject *self, PyObject *args)
 static PyMethodDef capiMethods[] = {
     {"file_to_mat_capi",                   /* the Python method name that will be used */
       (PyCFunction) file_to_mat_capi, /* the C-function that implements the Python function and returns static PyObject*  */
+      METH_VARARGS,           /* flags indicating parametersaccepted for this function */
+      PyDoc_STR("A geometric series up to n. sum_up_to_n(z^n)")}, /*  The docstring for the function *///NEED TO CHANGE DESCRIPTION
+
+    {"wam_capionn",                   /* the Python method name that will be used */
+      (PyCFunction) wam_capionn, /* the C-function that implements the Python function and returns static PyObject*  */
       METH_VARARGS,           /* flags indicating parametersaccepted for this function */
       PyDoc_STR("A geometric series up to n. sum_up_to_n(z^n)")}, /*  The docstring for the function *///NEED TO CHANGE DESCRIPTION
 
