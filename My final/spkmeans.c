@@ -1500,7 +1500,7 @@ int main(int argc, char *argv[]){
     /*in lnorm and ddg, maybe also wam and jacobi, there is inaccuracies like 0.0006, check
         if it something needed fix*/
 
-    int j;
+    /*int j;
     char* goal; 
     char *file_name;
     int *size;
@@ -1510,11 +1510,11 @@ int main(int argc, char *argv[]){
         
         file_name = argv[2];
         size = mat_size(file_name);/*size[0] is row, size[1] is col*/
-        mat = file_to_mat(file_name);
+        /*mat = file_to_mat(file_name);
         goal = argv[1];/*the enum*/
 
 
-        if (strcmp(goal, "wam") == 0) {
+        /*if (strcmp(goal, "wam") == 0) {
             mat_to_print = wam_func(mat, size[0], size[1]);
         }
         else if (strcmp(goal, "ddg") == 0) {
@@ -1533,18 +1533,18 @@ int main(int argc, char *argv[]){
 
         print_mat_normal(mat_to_print, size[0], size[0]);/*the mat is square matrix*/
 
-        if (strcmp(goal, "jacobi") == 0) {/*jacobi is (Nx1)xN*/
-            for (j = 0; j < size[0]-1; j++){
+        /*if (strcmp(goal, "jacobi") == 0) {/*jacobi is (Nx1)xN*/
+          /*  for (j = 0; j < size[0]-1; j++){
                 printf("%.4f,", mat_to_print[size[0]][j]);
             }
             printf("%.4f\n", mat_to_print[size[0]][size[0]-1]);
         }
         
     }/*end of if*/
-    else{
+    /*else{
         printf("Invalid Input!\n");
         return 1;
-    }
+    }*/
 
 
     /*char *file_name;
@@ -1585,20 +1585,24 @@ int main(int argc, char *argv[]){
 
 
     /*return kmeans(3, 600, "input_1.txt", "output_1101_cc_001_.txt");*/
-    /*
+    
 
 
 
-
+    double arr[3];
     char *file_name;
     int *size, k;
     double **mat, **jacobi_mat, **wam_mat, **ddg_mat, **ddg_sqrt, **lnorm_mat;
-    file_name = "tmpFile.txt";
+    file_name = "input_1.txt";
     size = mat_size(file_name);
     mat = get_mat(file_name, size[0], size[1]);
     mat = file_to_mat(file_name);
-    print_mat_normal(mat, size[0], size[1]);
-    kmeans_double(3, 600, 0.1, mat, size[0], size[1]);*/
+    /*print_mat_normal(mat, size[0], size[1]);*/
+    arr[0] = 0;
+    arr[1] = 1;
+    arr[2] = 2;
+    printf("row is: %d, col is: %d\n", size[0], size[1]);
+    kmeans_double(3, 600, 0.01, mat, size[0], size[1], arr);
 
     /*wam_mat = wam_func(mat, size[0], size[1]);
     ddg_mat = ddg_func(mat, size[0], size[1]);
