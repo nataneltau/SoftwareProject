@@ -399,15 +399,15 @@ static PyObject* kmeans_double_capi(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "iidOiiO", &k, &max_iter, &eps, &float_mat, &row, &col, &ind_matrix)){
         return NULL;
     }
-    printf("we are in module\n");
+    /*printf("we are in module\n");*/
 
 
     mat = python_mat_to_C_mat(float_mat);
-    printf("we finish float mat\n"); 
+    /*printf("we finish float mat\n"); */
     index_mat = python_list_to_C_arr(ind_matrix);
 
-    printf("we are about to send to kmeans_double\n");
-    printf("col is: %d\n", col);
+    /*printf("we are about to send to kmeans_double\n");
+    printf("col is: %d\n", col);*/
 
 
 /* This builds the answer ("d" = Convert a C double to a Python floating point number) back into a python object */
@@ -425,13 +425,13 @@ static PyObject* vectors_matrix_capi(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    printf("size is: %d, k is: %d\n", size, k);
+    /*printf("size is: %d, k is: %d\n", size, k);*/
 
     mat = python_mat_to_C_mat(float_mat);
 
-    printf("\nmat\n");
+    /*printf("\nmat\n");
     print_mat_normal(mat, size, size-1);
-    printf("\nmat\n");
+    printf("\nmat\n");*/
 
     return C_mat_to_python_mat(vectors_matrix(mat, size, k), size-1, k);
 }/*end of vectors_matrix_capi function*/

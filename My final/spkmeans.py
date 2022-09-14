@@ -117,8 +117,8 @@ def kmeans_plus_plus(k, max_iter, eps, mat):
     lst_centroids.append(centroid)
     centroids_indices.append(index)
 
-    print("we inside kmeas++ in py, row is", N, "col is", cor_num)
-    print(nodes)
+    #print("we inside kmeas++ in py, row is", N, "col is", cor_num)
+    #print(nodes)
  
     #print("lst_centroids is:")
     #print(lst_centroids)
@@ -139,10 +139,13 @@ def kmeans_plus_plus(k, max_iter, eps, mat):
 
         #print("3")
 
-    print("we are about to print random choice")
-    print(centroids_indices)
+    #print("we are about to print random choice")
+    #print(centroids_indices)
+    for item in range(0, k-1):
+        print("%d" %centroids_indices[item], end = ',')
+    print(centroids_indices[k-1])
 
-    kpp_res = kpp.kmeans_double_capi(k, max_iter, eps, mat, N, cor_num, centroids_indices)   # result will be written to output
+    kpp_res = kpp.kmeans_double_capi(k, 300, 0, mat, N, cor_num, centroids_indices)   # result will be written to output
 
     if kpp_res != 0:
         print("An Error Has Occurred")
@@ -180,19 +183,19 @@ if __name__ == '__main__':
                 if k == 0:
                     k = heuristic(file_name)
 
-                print(" we pass k in spk")
+                #print("we pass k in spk")
                 
                 lnorm_mat = lnorm_func(file_name)
                 jacobi_mat = jacobi_func(lnorm_mat, len(lnorm_mat))
-                print("jac mat is:")
-                print_matrix(jacobi_mat, k)
-                print()
-                print("we start kmeans")
+                #print("jac mat is:")
+                #print_matrix(jacobi_mat, k)
+                #print()
+                #print("we start kmeans")
                 vec_mat = vectors_matrix_func(jacobi_mat, k)
-                print("we calc vec")
-                print_matrix(vec_mat, k)
-                print()
-                kmeans_plus_plus(k, 300, 0.01, vec_mat)
+                #print("we calc vec")
+                #print_matrix(vec_mat, k)
+                #print()
+                kmeans_plus_plus(k, 300, 0, vec_mat)
 
             elif goali == "wam":
                 #print("row and col\n")
