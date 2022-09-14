@@ -17,12 +17,15 @@ class goal(enum.Enum):
 
 def calc_DL(row, centroids, cor_num):
     min_diff = sys.maxsize
+    #print("a")
     for centroid in centroids:
         diff = 0
+        #print("b")
         for j in range(cor_num):
-            diff += ((row[j] - centroid['x_' + str(j)]) ** 2)
+            diff += ((row[j] - centroid[j]) ** 2)
         if diff < min_diff:
             min_diff = diff
+        #print("c")
     return min_diff
 
 def print_matrix(matrix, col):
@@ -116,22 +119,25 @@ def kmeans_plus_plus(k, max_iter, eps, mat):
 
     print("we inside kmeas++ in py, row is", N, "col is", cor_num)
     print(nodes)
+ 
+    #print("lst_centroids is:")
+    #print(lst_centroids)
 
     for i in range(1, k):
         nodes['D'] = nodes.apply(lambda row: calc_DL(row, lst_centroids, cor_num), axis=1)
         sum_D = nodes['D'].sum()
 
-        print("1")
+        #print("1")
 
         nodes['P'] = nodes['D'].apply(lambda dl: dl / sum_D)
 
-        print("2")
+        #print("2")
 
         key = np.random.choice(nodes.index.values, p=nodes['P'])
         lst_centroids.append(nodes.loc[key])
         centroids_indices.append(key)
 
-        print("3")
+        #print("3")
 
     print("we are about to print random choice")
     print(centroids_indices)
@@ -178,6 +184,9 @@ if __name__ == '__main__':
                 
                 lnorm_mat = lnorm_func(file_name)
                 jacobi_mat = jacobi_func(lnorm_mat, len(lnorm_mat))
+                print("jac mat is:")
+                print_matrix(jacobi_mat, k)
+                print()
                 print("we start kmeans")
                 vec_mat = vectors_matrix_func(jacobi_mat, k)
                 print("we calc vec")

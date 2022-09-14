@@ -90,7 +90,7 @@ static double **python_mat_to_C_mat(PyObject *py_mat){
 
         if(!mat[i]){/*calloc failed*/
         printf("An Error Has Occurred\n");
-        exit(1);
+        return NULL;
         }
     }
     
@@ -112,6 +112,36 @@ static double **python_mat_to_C_mat(PyObject *py_mat){
     return mat;
 
 }/*end of python_mat_to_C_mat function*/
+
+static double *python_list_to_C_arr(PyObject *py_list){
+    double *arr;
+    int length_arr, i;
+    /*PyObject *list;*/
+
+    if(!PyList_Check(py_list)){
+        return NULL;
+    }/*end of if*/
+
+    length_arr = PyList_Size(py_list);
+
+    arr = (double *)calloc(length_arr, sizeof(double));
+
+    if(!arr){/*calloc failed*/
+        printf("An Error Has Occurred\n");
+        return NULL;
+    }
+
+    for(i=0; i<length_arr; i++){
+        arr[i] = PyFloat_AsDouble(PyList_GetItem(py_list,i));
+            if(arr[i] == -1.0 && PyErr_Occurred()){
+                printf("An Error Has Occurred\n");
+                return NULL;
+            }
+
+    }/*end of for*/
+
+    return arr;
+}/*end of python_list_to_C_arr function*/
 
 /*converting C matrix to a python matrix (list of lists)*/
 static PyObject *C_mat_to_python_mat(double **mat, int row, int col){
@@ -362,18 +392,22 @@ static PyObject* kmeans_double_capi(PyObject *self, PyObject *args)
     double eps;
     int k, max_iter = 300;
     double **mat;
-    double **index_mat;
+    double *index_mat;
     int row, col;
     PyObject *float_mat, *ind_matrix;
 
     if (!PyArg_ParseTuple(args, "iidOiiO", &k, &max_iter, &eps, &float_mat, &row, &col, &ind_matrix)){
         return NULL;
     }
-
+    printf("we are in module\n");
 
 
     mat = python_mat_to_C_mat(float_mat);
-    index_mat = python_mat_to_C_mat(ind_matrix);
+    printf("we finish float mat\n"); 
+    index_mat = python_list_to_C_arr(ind_matrix);
+
+    printf("we are about to send to kmeans_double\n");
+    printf("col is: %d\n", col);
 
 
 /* This builds the answer ("d" = Convert a C double to a Python floating point number) back into a python object */

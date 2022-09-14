@@ -20,6 +20,7 @@ enum goal{wam, ddg, lnorm, jacobi};
 const int DEFAULT_ITER = 200;
 double epsi;
 
+void print_mat_normal(double **mat, int row, int col);
 
 /*maybe add a func that will count the numbers of lines(point) in the file
 that way i will able to allocate arrays and not work with lists, can use it in
@@ -143,7 +144,7 @@ void update_centroids(double clus_len, double **cluster, int dimension, double *
 }/*end of function update_centroids*/
 
 /*tested on input, worked right*/
-int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int dimension, double **first_index){/*should write the k wanted centroid at the start of the file*/
+int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int dimension, double *first_index){/*should write the k wanted centroid at the start of the file*/
 
     int iter_num = 0;
     double *buff;
@@ -166,8 +167,10 @@ int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int di
 
     epsi = eps;
 
+    printf("we strating\n");
 
-    if(row <= 0 || dimension <= 0 || k <= 0 || max_iter <= 0){
+
+    if(row <= 0 || dimension <= 0 || k <= 0 || max_iter <= 0 || k>row){
         printf("Invalid Input!\n");
         exit(1);
     }
@@ -260,13 +263,16 @@ int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int di
 
         }
     }
+
+    printf("we finished callocs\n");
     
 
     for(i=0; i<k; i++){
 
-        memcpy(arr_centroids[i], mat[(int)first_index[0][i]], dimension * sizeof(double));
+        memcpy(arr_centroids[i], mat[(int)first_index[i]], dimension * sizeof(double));
     }
 
+    printf("we start while\n");
 
     while((iter_num != max_iter) && !(euclidean_norm_double(k, arr_centroids, arr_prev_centroids, dimension, iter_num))){
         
@@ -330,13 +336,13 @@ int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int di
 
     }/*end of while*/
 
-
+    printf("we finish while\n");
 
     /*printf("number of iter: %d\n", iter_num);*/
 
     for(i=0; i<k; i++){/*write to file the centroids*/
         
-        for(j=0; j<dimension; j++){
+        for(j=0; j<dimension-1; j++){
 
             fprintf(stdout, "%.4f, ", arr_centroids[i][j]);
         }
@@ -1160,15 +1166,18 @@ double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1
     int i, j;
     double tmp, sum;
     int index;
+    int real_size_of_jac;/*jacobi is (Nx1)xN*/
 
-    vec_mat = (double **)calloc(N, sizeof(double *));
+    real_size_of_jac = N-1;
+
+    vec_mat = (double **)calloc(real_size_of_jac, sizeof(double *));
 
     if(!vec_mat){/*calloc failed*/
         printf("An Error Has Occurred\n");
         exit(1);
     }
 
-    for(i=0; i<N; i++){
+    for(i=0; i<real_size_of_jac; i++){
         vec_mat[i] = (double *)calloc(k, sizeof(double));
 
         if(!vec_mat[i]){/*calloc failed*/
@@ -1183,16 +1192,17 @@ double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1
         tmp = mat[0][0];
         index = 0;
 
-        for(j=1; j<N; j++){
+        for(j=1; j<real_size_of_jac; j++){
             if(mat[0][j] > tmp){
                 tmp = mat[0][j];
                 index = j;
             }
         }
 
+
         /*index = calc_largest_vec(mat, N);*/
 
-        for(j=0; j<N; j++){
+        for(j=0; j<real_size_of_jac; j++){
 
             vec_mat[j][i] = mat[index+1][j]; /*letting the largest vector as column j*/
 
@@ -1208,9 +1218,11 @@ double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1
 
     }/*end of outer for*/
 
+    print_mat_normal(vec_mat, real_size_of_jac, k);
+
     /*step 5 of alg, renormalizing each of vec_mat rows*/
 
-    for(i=0; i<N; i++){
+    for(i=0; i<real_size_of_jac; i++){
 
         sum =0;
 
