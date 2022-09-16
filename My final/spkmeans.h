@@ -22,5 +22,7 @@ int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int di
 
 double **vectors_matrix(double **mat, int N, int k);
 
+double **alg_spk(char *file_name, int k);
+
 #endif
 

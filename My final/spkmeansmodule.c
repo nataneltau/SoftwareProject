@@ -436,6 +436,27 @@ static PyObject* vectors_matrix_capi(PyObject *self, PyObject *args)
     return C_mat_to_python_mat(vectors_matrix(mat, size, k), size-1, k);
 }/*end of vectors_matrix_capi function*/
 
+static PyObject* vectors_matrix_another_try_capi(PyObject *self, PyObject *args)
+{
+    char *file_name;
+    int k, row;/*Square matrix*/
+    double **mat;
+
+    if (!PyArg_ParseTuple(args, "sii", &file_name, &k, &row)){
+        return NULL;
+    }
+
+    /*printf("size is: %d, k is: %d\n", size, k);*/
+
+    /*printf("\nmat\n");
+    print_mat_normal(mat, size, size-1);
+    printf("\nmat\n");*/
+
+    mat = alg_spk(file_name, k);
+
+    return C_mat_to_python_mat(mat , row, k);
+}/*end of vectors_matrix_capi function*/
+
 
 /*static PyObject* wam_capi(PyObject *self, PyObject *args)
 {
@@ -555,6 +576,12 @@ static PyMethodDef capiMethods[] = {
       (PyCFunction) vectors_matrix_capi, /* the C-function that implements the Python function and returns static PyObject*  */
       METH_VARARGS,           /* flags indicating parametersaccepted for this function */
       PyDoc_STR("A geometric series up to n. sum_up_to_n(z^n)")}, /*  The docstring for the function *///NEED TO CHANGE DESCRIPTION
+
+    {"vectors_matrix_another_try_capi",                   /* the Python method name that will be used */
+      (PyCFunction) vectors_matrix_another_try_capi, /* the C-function that implements the Python function and returns static PyObject*  */
+      METH_VARARGS,           /* flags indicating parametersaccepted for this function */
+      PyDoc_STR("A geometric series up to n. sum_up_to_n(z^n)")}, /*  The docstring for the function *///NEED TO CHANGE DESCRIPTION
+
 
     {NULL, NULL, 0, NULL}     /* The last entry must be all NULL as shown to act as a
                                  sentinel. Python looks for this entry to know that all

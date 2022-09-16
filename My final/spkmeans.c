@@ -5,6 +5,30 @@
 #include "spkmeans.h" /*our library*/
 /* check that we free al unnecessary memory */
 
+typedef struct eigenStruct{
+    double *Pointer;
+    int originalIndex;  /* for a stable sort*/
+} eigenStruct;
+
+int compare_eigenStruct(const void *a, const void *b){
+    /* compare function for a stable sort based on the eigenvalue */
+    int res;
+
+    eigenStruct A = *(eigenStruct*)a;
+    eigenStruct B = *(eigenStruct*)b;
+
+
+    if (*(A.Pointer) < *(B.Pointer))
+        res = 1;
+    else if (*(A.Pointer) > *(B.Pointer))
+        res = -1;
+    else{
+        if ((A.originalIndex) < (B.originalIndex)) res = -1;
+        else if ((A.originalIndex) > (B.originalIndex)) res = 1;
+        else res = 0;
+    }
+    return res;
+}
 
 /*ENUM*/
 enum goal{wam, ddg, lnorm, jacobi};
@@ -340,19 +364,19 @@ int kmeans_double(int k, int max_iter, double eps, double** mat, int row, int di
 
     }/*end of while*/
 
-
+    print_mat_normal(arr_centroids, k, dimension);
     /*printf("number of iter: %d\n", iter_num);*/
 
-    for(i=0; i<k; i++){/*write to file the centroids*/
+    /*for(i=0; i<k; i++){write to file the centroids*/
         
-        for(j=0; j<dimension-1; j++){
+        /*for(j=0; j<dimension-1; j++){
 
             fprintf(stdout, "%.4f, ", arr_centroids[i][j]);
         }
 
         fprintf(stdout, "%.4f\n", arr_centroids[i][dimension-1]);
 
-    }/*end of for*/
+    }*//*end of for*/
 
     for(f=0; f<k; f++){
         for(j =0; j<row; j++){
@@ -1162,16 +1186,41 @@ int calc_largest_vec(double **mat, int N){
 
 }/*end of function calc_argmin*/
 
-/*this function get jacobi matrix*/
-double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1*/
-
+double **alg_spk(char *file_name, int k){
     double **vec_mat;
     int i, j;
     double tmp, sum;
     int index;
     int real_size_of_jac;/*jacobi is (Nx1)xN*/
+    int n;
+    eigenStruct eigenStructI;
+    int *size;
+    double **mat, **lnorm_matrix;
 
-    real_size_of_jac = N-1;
+
+
+    size = mat_size(file_name);/*size[0] is row, size[1] is col*/
+    mat = file_to_mat(file_name);
+
+
+    lnorm_matrix = lnorm_func(mat, size[0], size[1]);
+    mat = jacobi_func(lnorm_matrix, size[0]);
+
+    real_size_of_jac = size[0];
+    n = real_size_of_jac;
+    /* creating a list of pointers to the eigenvalues, that will be used to sort the eigenvectors according to the eigenvalue and original index: */
+    eigenStruct *pointers_list = (eigenStruct*) malloc(n*sizeof(eigenStruct));
+
+    /* filling a pointers list of the eigenvalues: */
+    for(i=0 ; i<n ; i++){
+        eigenStructI.Pointer = &(mat[0][i]);
+        eigenStructI.originalIndex = i; /* saving the original index in eigenvalue array to enable a stable sort */
+        pointers_list[i] = eigenStructI;
+    }
+
+    /* sorting the pointers list: */
+    qsort(pointers_list, n, sizeof(eigenStruct), compare_eigenStruct);
+
 
     vec_mat = (double **)calloc(real_size_of_jac, sizeof(double *));
 
@@ -1180,17 +1229,20 @@ double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1
         exit(1);
     }
 
+    /*printf("printig jacobi\n");
+    print_mat_normal(mat, N, N-1);*/
+
     for(i=0; i<real_size_of_jac; i++){
         vec_mat[i] = (double *)calloc(k, sizeof(double));
 
         if(!vec_mat[i]){/*calloc failed*/
             printf("An Error Has Occurred\n");
             exit(1);
-        }
+            }
     }/*end of for*/
 
     for(i = 0; i<k; i++){
-
+    
         /*choose the first eigenvectors*/
         tmp = mat[0][0];
         index = 0;
@@ -1201,16 +1253,17 @@ double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1
                 index = j;
             }
         }
-
-
+        index = pointers_list[i].originalIndex;
+        /*printf("index is, orig: %d\n", index);*/
+ 
         /*index = calc_largest_vec(mat, N);*/
 
         for(j=0; j<real_size_of_jac; j++){
 
-            vec_mat[j][i] = mat[index+1][j]; /*letting the largest vector as column j*/
+            vec_mat[j][i] = mat[j+1][index]; /*letting the largest vector as column j*/
 
         }/*end of inner for*/
-
+    
         /*for(j=0; j<N; j++){
 
             mat[index+1][j] = 0; make the largest full of zeroes
@@ -1220,14 +1273,14 @@ double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1
         mat[0][index] = 0;
 
     }/*end of outer for*/
-
-    /*print_mat_normal(vec_mat, real_size_of_jac, k);*/
+    /*printf("printig U\n");
+    print_mat_normal(vec_mat, real_size_of_jac, k);*/
 
     /*step 5 of alg, renormalizing each of vec_mat rows*/
 
     for(i=0; i<real_size_of_jac; i++){
 
-        sum =0;
+        sum =0.0;
 
         for(j=0; j<k; j++){
 
@@ -1239,10 +1292,126 @@ double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1
         }/*end of inner for*/
 
         sum = sqrt(sum);
-
+    
         if(sum == 0){
             continue;
+    }
+
+        for(j=0; j<k; j++){
+
+            vec_mat[i][j] /= sum;
+
+        }/*end of inner for*/
+
+
+    }/*end of outer for*/
+
+    return vec_mat;
+
+}/*end of alg_spk function*/
+    
+
+
+/*this function get jacobi matrix*/
+double **vectors_matrix(double **mat, int N, int k){/*do step 4-5 in algorithm 1*/
+
+    double **vec_mat;
+    int i, j;
+    double tmp, sum;
+    int index;
+    int real_size_of_jac = N-1;/*jacobi is (Nx1)xN*/
+    int n = real_size_of_jac;
+    eigenStruct eigenStructI;
+    /* creating a list of pointers to the eigenvalues, that will be used to sort the eigenvectors according to the eigenvalue and original index: */
+    eigenStruct *pointers_list = (eigenStruct*) malloc(real_size_of_jac*sizeof(eigenStruct));
+
+    /* filling a pointers list of the eigenvalues: */
+    for(i=0 ; i<n ; i++){
+        eigenStructI.Pointer = &(mat[0][i]);
+        eigenStructI.originalIndex = i; /* saving the original index in eigenvalue array to enable a stable sort */
+        pointers_list[i] = eigenStructI;
+    }
+
+    /* sorting the pointers list: */
+    qsort(pointers_list, n, sizeof(eigenStruct), compare_eigenStruct);
+
+    
+    real_size_of_jac = N-1;
+
+    vec_mat = (double **)calloc(real_size_of_jac, sizeof(double *));
+
+    if(!vec_mat){/*calloc failed*/
+        printf("An Error Has Occurred\n");
+        exit(1);
+    }
+
+    printf("printig jacobi\n");
+    print_mat_normal(mat, N, N-1);
+
+    for(i=0; i<real_size_of_jac; i++){
+        vec_mat[i] = (double *)calloc(k, sizeof(double));
+
+        if(!vec_mat[i]){/*calloc failed*/
+            printf("An Error Has Occurred\n");
+            exit(1);
+            }
+    }/*end of for*/
+
+    for(i = 0; i<k; i++){
+    
+        /*choose the first eigenvectors*/
+        tmp = mat[0][0];
+        index = 0;
+
+        for(j=1; j<real_size_of_jac; j++){
+            if(mat[0][j] > tmp){
+                tmp = mat[0][j];
+                index = j;
+            }
         }
+        index = pointers_list[i].originalIndex;
+        printf("index is, orig: %d\n", index);
+ 
+        /*index = calc_largest_vec(mat, N);*/
+
+        for(j=0; j<real_size_of_jac; j++){
+
+            vec_mat[j][i] = mat[j+1][index]; /*letting the largest vector as column j*/
+
+        }/*end of inner for*/
+    
+        /*for(j=0; j<N; j++){
+
+            mat[index+1][j] = 0; make the largest full of zeroes
+
+        }end of inner for*/
+
+        mat[0][index] = 0;
+
+    }/*end of outer for*/
+    /*printf("printig U\n");
+    print_mat_normal(vec_mat, real_size_of_jac, k);*/
+
+    /*step 5 of alg, renormalizing each of vec_mat rows*/
+
+    for(i=0; i<real_size_of_jac; i++){
+
+        sum =0.0;
+
+        for(j=0; j<k; j++){
+
+            tmp = vec_mat[i][j];
+            tmp = pow(tmp, 2);
+            sum += tmp;
+
+
+        }/*end of inner for*/
+
+        sum = sqrt(sum);
+    
+        if(sum == 0){
+            continue;
+    }
 
         for(j=0; j<k; j++){
 

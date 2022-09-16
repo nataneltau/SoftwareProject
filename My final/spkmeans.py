@@ -99,12 +99,14 @@ def heuristic(file_name):
     mat = make_double_mat(file_name)
     return kpp.heuristic_capi(mat, row, col)
 
-def vectors_matrix_func(mat, k):
-    return kpp.vectors_matrix_capi(mat, len(mat), k)
+def vectors_matrix_func(file_name, k, row):
+    #return kpp.vectors_matrix_capi(mat, len(mat), k)
+    return kpp.vectors_matrix_another_try_capi(file_name, k, row)
 
 
 def kmeans_plus_plus(k, max_iter, eps, mat):
     
+    #mat = [[-1.0, 0.0], [0.0, -1.0], [0.0, -1.0], [-1.0, 0.0], [1.0, 0.0], [0.0, 1.0]]
     N = len(mat)
     cor_num = len(mat[0])
     lst_centroids = []
@@ -185,17 +187,18 @@ if __name__ == '__main__':
 
                 #print("we pass k in spk")
                 
-                lnorm_mat = lnorm_func(file_name)
-                jacobi_mat = jacobi_func(lnorm_mat, len(lnorm_mat))
+                #lnorm_mat = lnorm_func(file_name)
+                #jacobi_mat = jacobi_func(lnorm_mat, len(lnorm_mat))
                 #print("jac mat is:")
                 #print_matrix(jacobi_mat, k)
                 #print()
                 #print("we start kmeans")
-                vec_mat = vectors_matrix_func(jacobi_mat, k)
+                row, col = get_mat_size(file_name)
+                vec_mat = vectors_matrix_func(file_name, k, row)
                 #print("we calc vec")
                 #print_matrix(vec_mat, k)
                 #print()
-                kmeans_plus_plus(k, 300, 0, vec_mat)
+                kmeans_plus_plus(k, 300, 0.01, vec_mat)
 
             elif goali == "wam":
                 #print("row and col\n")
